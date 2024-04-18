@@ -17,12 +17,17 @@ struct CardView: View {
             / geometry.size.height
             
             ZStack {
-                RoundedRectangle(
+                let base = RoundedRectangle(
                     cornerRadius: Constants.cornerRadius
                 )
-                .strokeBorder(
-                    lineWidth: Constants.lineWidth
-                )
+                
+                base
+                    .foregroundStyle(card.backgroundColor)
+                
+                base
+                    .strokeBorder(
+                        lineWidth: Constants.lineWidth
+                    )
                 
                 VStack {
                     ForEach(

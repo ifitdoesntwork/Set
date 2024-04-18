@@ -46,4 +46,18 @@ class SetGameViewModel: ObservableObject {
         model.cards
             .filter { !$0.isInDeck }
     }
+    
+    func choose(_ card: ThemedSetGame.Card) {
+        model
+            .choose(card)
+    }
+}
+
+extension SetGameViewModel.ThemedSetGame.Card {
+    
+    var backgroundColor: SwiftUI.Color {
+        isChosen 
+            ? .yellow.opacity(0.3)
+            : .clear
+    }
 }

@@ -38,6 +38,12 @@ struct SetGame<Color, Shape, Shading, Number> {
             .forEach { cards[$0].isInDeck = false }
     }
     
+    mutating func choose(_ card: Card) {
+        cards
+            .firstIndex { $0.id == card.id }
+            .map { cards[$0].isChosen = true }
+    }
+    
     struct Card: Identifiable {
         
         struct Content {
@@ -48,6 +54,7 @@ struct SetGame<Color, Shape, Shading, Number> {
         }
         
         var isInDeck = true
+        var isChosen = false
         
         let content: Content
         let id = UUID().uuidString

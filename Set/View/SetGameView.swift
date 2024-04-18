@@ -15,9 +15,14 @@ struct SetGameView: View {
             viewModel.cards,
             aspectRatio: Constants.aspectRatio,
             maxColumns: Constants.maxColumns
-        ) {
-            CardView(card: $0)
+        ) { card in
+            
+            CardView(card: card)
                 .padding(Constants.cardPadding)
+                .onTapGesture {
+                    viewModel
+                        .choose(card)
+                }
         }
         .padding()
     }
