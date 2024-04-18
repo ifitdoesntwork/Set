@@ -10,6 +10,7 @@ import SwiftUI
 
 struct CardView: View {
     let card: SetGameViewModel.ThemedSetGame.Card
+    let isMatch: Bool?
     
     var body: some View {
         GeometryReader { geometry in
@@ -22,12 +23,17 @@ struct CardView: View {
                 )
                 
                 base
-                    .foregroundStyle(card.backgroundColor)
+                    .foregroundStyle(
+                        card
+                            .backgroundColor(isMatch: isMatch)
+                            .opacity(0.3)
+                    )
                 
                 base
                     .strokeBorder(
                         lineWidth: Constants.lineWidth
                     )
+                    .foregroundStyle(.gray)
                 
                 VStack {
                     ForEach(
@@ -69,14 +75,17 @@ struct CardView: View {
         )
         
         ForEach(0..<count, id: \.self) {
-            CardView(card: .init(
-                content: .init(
-                    color: Theme.classic.colors[$0],
-                    shape: Theme.classic.shapes[$0],
-                    shading: Theme.classic.shadings[$0],
-                    number: Theme.classic.numbers[$0]
-                )
-            ))
+            CardView(
+                card: .init(
+                    content: .init(
+                        color: Theme.classic.colors[$0],
+                        shape: Theme.classic.shapes[$0],
+                        shading: Theme.classic.shadings[$0],
+                        number: Theme.classic.numbers[$0]
+                    )
+                ),
+                isMatch: nil
+            )
         }
     }
     .padding()

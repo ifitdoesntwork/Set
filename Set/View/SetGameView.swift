@@ -17,7 +17,7 @@ struct SetGameView: View {
             maxColumns: Constants.maxColumns
         ) { card in
             
-            CardView(card: card)
+            CardView(card: card, isMatch: viewModel.isMatch)
                 .padding(Constants.cardPadding)
                 .onTapGesture {
                     viewModel

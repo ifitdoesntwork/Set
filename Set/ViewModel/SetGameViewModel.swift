@@ -44,20 +44,15 @@ class SetGameViewModel: ObservableObject {
     
     var cards: [ThemedSetGame.Card] {
         model.cards
-            .filter { !$0.isInDeck }
+            .filter { $0.state == .dealt }
+    }
+    
+    var isMatch: Bool? {
+        model.isMatch
     }
     
     func choose(_ card: ThemedSetGame.Card) {
         model
             .choose(card)
-    }
-}
-
-extension SetGameViewModel.ThemedSetGame.Card {
-    
-    var backgroundColor: SwiftUI.Color {
-        isChosen 
-            ? .yellow.opacity(0.3)
-            : .clear
     }
 }

@@ -7,7 +7,12 @@
 
 import Foundation
 
-struct SetGame<Color, Shape, Shading, Number> {
+struct SetGame<Color, Shape, Shading, Number>
+where Color: Hashable,
+      Shape: Hashable,
+      Shading: Hashable,
+      Number: Hashable
+{
     private(set) var cards: [Card]
     
     init(
@@ -35,7 +40,25 @@ struct SetGame<Color, Shape, Shading, Number> {
         
         cards
             .indices[0..<12]
-            .forEach { cards[$0].isInDeck = false }
+            .forEach { cards[$0].state = .dealt }
+    }
+    
+    private var chosenCards: [Card] {
+        cards
+            .filter(\.isChosen)
+    }
+    
+    var isMatch: Bool? {
+        guard 
+            chosenCards.count == 3
+        else {
+            return nil
+        }
+        
+        return chosenCards
+            .map(\.content)
+            .hashables()
+            .allSatisfy(\.isSet)
     }
     
     mutating func choose(_ card: Card) {
@@ -53,10 +76,37 @@ struct SetGame<Color, Shape, Shading, Number> {
             let number: Number
         }
         
-        var isInDeck = true
-        var isChosen = false
+        enum State {
+            case inDeck
+            case dealt
+            case discarded
+        }
+        
+        fileprivate(set) var state = State.inDeck
+        fileprivate(set) var isChosen = false
         
         let content: Content
         let id = UUID().uuidString
+    }
+}
+
+private extension Array {
+    
+    func hashables<T, U, V, W>() -> [[AnyHashable]]
+    where Element == SetGame<T, U, V, W>.Card.Content {
+        [
+            map(\.color),
+            map(\.number),
+            map(\.shading),
+            map(\.shape)
+        ]
+    }
+}
+
+private extension Array where Element: Hashable {
+    
+    var isSet: Bool {
+        let set = Set(self)
+        return set.count == count || set.count == 1
     }
 }

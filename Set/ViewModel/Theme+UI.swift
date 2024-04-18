@@ -77,3 +77,24 @@ extension Theme.Shape {
         }
     }
 }
+
+extension SetGameViewModel.ThemedSetGame.Card {
+    
+    func backgroundColor(
+        isMatch: Bool?
+    ) -> SwiftUI.Color {
+        
+        if isChosen {
+            switch isMatch {
+            case .some(true):
+                .green
+            case .some(false):
+                .red
+            case .none:
+                .yellow
+            }
+        } else {
+            .clear
+        }
+    }
+}
