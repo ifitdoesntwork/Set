@@ -29,8 +29,8 @@ struct CardView: View {
                         1...card.content.number.rawValue,
                         id: \.self
                     ) { _ in
-                        card.content.shape.ui
-                            .shading(card.content.shading)
+                        card.content.shape
+                            .ui(shading: card.content.shading)
                             .padding(Constants.padding)
                             .aspectRatio(
                                 aspectRatio * 3,
@@ -55,36 +55,24 @@ struct CardView: View {
 
 #Preview {
     VStack {
-        CardView(
-            card: .init(
-                content: .init(
-                    color: Theme.Color.red,
-                    shape: Theme.Shape.diamond,
-                    shading: Theme.Shading.open,
-                    number: Theme.Number.one
-                )
-            )
+        
+        let count = min(
+            Theme.classic.colors.count,
+            Theme.classic.numbers.count,
+            Theme.classic.shadings.count,
+            Theme.classic.shapes.count
         )
-        CardView(
-            card: .init(
+        
+        ForEach(0..<count, id: \.self) {
+            CardView(card: .init(
                 content: .init(
-                    color: Theme.Color.green,
-                    shape: Theme.Shape.oval,
-                    shading: Theme.Shading.solid,
-                    number: Theme.Number.three
+                    color: Array(Theme.classic.colors)[$0],
+                    shape: Array(Theme.classic.shapes)[$0],
+                    shading: Array(Theme.classic.shadings)[$0],
+                    number: Array(Theme.classic.numbers)[$0]
                 )
-            )
-        )
-        CardView(
-            card: .init(
-                content: .init(
-                    color: Theme.Color.purple,
-                    shape: Theme.Shape.squiggle,
-                    shading: Theme.Shading.striped,
-                    number: Theme.Number.two
-                )
-            )
-        )
+            ))
+        }
     }
     .padding()
 }

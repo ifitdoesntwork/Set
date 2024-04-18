@@ -38,22 +38,7 @@ struct Diamond: Shape {
     }
 }
 
-extension Theme.Shape {
-    
-    @ViewBuilder
-    var ui: some View {
-        switch self {
-        case .diamond:
-            Diamond()
-        case .squiggle:
-            Rectangle()
-        case .oval:
-            Ellipse()
-        }
-    }
-}
-
-extension View {
+extension Shape {
     
     @ViewBuilder
     func shading(
@@ -66,11 +51,29 @@ extension View {
         case .striped:
             opacity(0.5)
         case .open:
-            ZStack {
-                opacity(1)
-                foregroundStyle(.background)
-                    .padding(10)
-            }
+            stroke(lineWidth: 5)
+                .padding(10)
+        }
+    }
+}
+
+extension Theme.Shape {
+    
+    @ViewBuilder
+    func ui(
+        shading: Theme.Shading
+    ) -> some View {
+        
+        switch self {
+        case .diamond:
+            Diamond()
+                .shading(shading)
+        case .squiggle:
+            Rectangle()
+                .shading(shading)
+        case .oval:
+            Ellipse()
+                .shading(shading)
         }
     }
 }
