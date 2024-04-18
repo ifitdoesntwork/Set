@@ -19,12 +19,17 @@ class SetGameViewModel: ObservableObject {
     private static func createGame(
         themed theme: Theme
     ) -> ThemedSetGame {
-        .init {
+        .init(
+            colorCount: theme.colors.count,
+            shapeCount: theme.shapes.count,
+            shadingCount: theme.shadings.count,
+            numberCount: theme.numbers.count
+        ) {
             .init(
-                color: theme.colors.randomElement()!,
-                shape: theme.shapes.randomElement()!,
-                shading: theme.shadings.randomElement()!,
-                number: theme.numbers.randomElement()!
+                color: theme.colors[$0],
+                shape: theme.shapes[$1],
+                shading: theme.shadings[$2],
+                number: theme.numbers[$3]
             )
         }
     }
@@ -37,7 +42,8 @@ class SetGameViewModel: ObservableObject {
         model = Self.createGame(themed: theme)
     }
     
-    var card: ThemedSetGame.Card {
-        model.card
+    var cards: [ThemedSetGame.Card] {
+        model.cards
+            .filter { !$0.isInDeck }
     }
 }

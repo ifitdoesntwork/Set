@@ -16,6 +16,7 @@
 		92A3AC1C2BCFC53500623609 /* Theme+UI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A3AC1B2BCFC53500623609 /* Theme+UI.swift */; };
 		92A3AC262BD0E8D100623609 /* CardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A3AC252BD0E8D100623609 /* CardView.swift */; };
 		92A3AC292BD0E93100623609 /* SetGameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A3AC282BD0E93100623609 /* SetGameView.swift */; };
+		92A3AC2B2BD0F4E500623609 /* AspectVGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A3AC2A2BD0F4E500623609 /* AspectVGrid.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -29,6 +30,7 @@
 		92A3AC1B2BCFC53500623609 /* Theme+UI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Theme+UI.swift"; sourceTree = "<group>"; };
 		92A3AC252BD0E8D100623609 /* CardView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CardView.swift; sourceTree = "<group>"; };
 		92A3AC282BD0E93100623609 /* SetGameView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SetGameView.swift; sourceTree = "<group>"; };
+		92A3AC2A2BD0F4E500623609 /* AspectVGrid.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AspectVGrid.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -110,6 +112,7 @@
 			children = (
 				92A3AC282BD0E93100623609 /* SetGameView.swift */,
 				92A3AC252BD0E8D100623609 /* CardView.swift */,
+				92A3AC2A2BD0F4E500623609 /* AspectVGrid.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -184,6 +187,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				92A3AC2B2BD0F4E500623609 /* AspectVGrid.swift in Sources */,
 				92A3AC262BD0E8D100623609 /* CardView.swift in Sources */,
 				92A3AC1C2BCFC53500623609 /* Theme+UI.swift in Sources */,
 				92A3AC292BD0E93100623609 /* SetGameView.swift in Sources */,

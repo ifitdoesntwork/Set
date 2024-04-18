@@ -66,10 +66,10 @@ struct CardView: View {
         ForEach(0..<count, id: \.self) {
             CardView(card: .init(
                 content: .init(
-                    color: Array(Theme.classic.colors)[$0],
-                    shape: Array(Theme.classic.shapes)[$0],
-                    shading: Array(Theme.classic.shadings)[$0],
-                    number: Array(Theme.classic.numbers)[$0]
+                    color: Theme.classic.colors[$0],
+                    shape: Theme.classic.shapes[$0],
+                    shading: Theme.classic.shadings[$0],
+                    number: Theme.classic.numbers[$0]
                 )
             ))
         }

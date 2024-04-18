@@ -51,8 +51,8 @@ extension Shape {
         case .striped:
             opacity(0.5)
         case .open:
-            stroke(lineWidth: 5)
-                .padding(10)
+            stroke(lineWidth: 4)
+                .padding(4)
         }
     }
 }

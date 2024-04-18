@@ -11,10 +11,21 @@ struct SetGameView: View {
     @ObservedObject var viewModel: SetGameViewModel
     
     var body: some View {
-        VStack {
-            CardView(card: viewModel.card)
+        AspectVGrid(
+            viewModel.cards,
+            aspectRatio: Constants.aspectRatio,
+            maxColumns: Constants.maxColumns
+        ) {
+            CardView(card: $0)
+                .padding(Constants.cardPadding)
         }
         .padding()
+    }
+    
+    private struct Constants {
+        static let aspectRatio: CGFloat = 2/3
+        static let maxColumns = 5
+        static let cardPadding: CGFloat = 4
     }
 }
 

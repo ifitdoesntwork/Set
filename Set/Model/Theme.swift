@@ -43,3 +43,13 @@ struct Theme {
         numbers: .init(Number.allCases)
     )
 }
+
+extension Set {
+    
+    subscript(
+        index: Int
+    ) -> Element {
+        
+        Array(self)[index]
+    }
+}
