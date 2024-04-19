@@ -51,7 +51,9 @@ class SetGameViewModel: ObservableObject {
         model.isMatch
     }
     
-    func choose(_ card: ThemedSetGame.Card) {
+    func choose(
+        _ card: ThemedSetGame.Card
+    ) {
         model
             .choose(card)
     }

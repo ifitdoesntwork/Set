@@ -39,8 +39,7 @@ where Color: Hashable,
         .shuffled()
         
         cards
-            .indices[0..<12]
-            .forEach { cards[$0].location = .dealt }
+            .deal(count: 12)
     }
     
     private var selectedCards: [Card] {
@@ -48,28 +47,79 @@ where Color: Hashable,
             .filter(\.isSelected)
     }
     
-    private var isSelectedEnough: Bool {
-        selectedCards.count == 3
+    private var dealCount: Int {
+        cards
+            .filter(\.isDealt)
+            .count
     }
     
     var isMatch: Bool? {
-        isSelectedEnough
-            ? selectedCards
-                .map(\.content)
-                .hashables()
-                .allSatisfy(\.isSet)
-            : nil
+        selectedCards.count == 3
+        ? selectedCards
+            .map(\.content)
+            .features()
+            .allSatisfy(\.isSet)
+        : nil
     }
     
-    mutating func choose(_ card: Card) {
-        cards
-            .firstIndex { $0.id == card.id }
-            .map {
-                isSelectedEnough
-                    ? print("ok")
-                    : cards[$0].isSelected.toggle()
-            }
+    mutating func choose(
+        _ card: Card
+    ) {
+        switch isMatch {
+        case .some(true):
+            processMatch(chosenCard: card)
+        case .some(false):
+            break
+        case .none:
+            cards[id: card.id]
+                .isSelected
+                .toggle()
+        }
     }
+    
+    private mutating func processMatch(
+        chosenCard: Card
+    ) {
+        let selectionIndices = selectedCards
+            .map { card in
+                cards
+                    .firstIndex { $0.id == card.id }
+            }
+            .compactMap { $0 }
+        
+        let selectionIds = selectedCards
+            .map(\.id)
+        
+        let oldDealCount = dealCount
+        
+        selectedCards
+            .map(\.id)
+            .forEach {
+                cards[id: $0].location = .matched
+                cards[id: $0].isSelected = false
+            }
+        
+        cards
+            .deal()
+        
+        if dealCount == oldDealCount {
+            selectionIndices
+                .forEach {
+                    cards.swapAt(
+                        $0,
+                        cards
+                            .lastIndex(where: \.isDealt)!
+                    )
+                }
+        }
+        
+        if !selectionIds.contains(chosenCard.id) {
+            choose(chosenCard)
+        }
+    }
+}
+
+extension SetGame {
     
     struct Card: Identifiable {
         
@@ -91,12 +141,42 @@ where Color: Hashable,
         
         let content: Content
         let id = UUID().uuidString
+        
+        var isDealt: Bool {
+            location == .dealt
+        }
     }
 }
 
 private extension Array {
     
-    func hashables<T, U, V, W>() -> [[AnyHashable]]
+    subscript<T, U, V, W>(
+        id id: String
+    ) -> SetGame<T, U, V, W>.Card!
+    where Element == SetGame<T, U, V, W>.Card {
+        get {
+            first { $0.id == id }
+        }
+        set {
+            firstIndex { $0.id == id }
+                .map { index in
+                    newValue
+                        .map { self[index] = $0 }
+                }
+        }
+    }
+    
+    mutating func deal<T, U, V, W>(
+        count: Int = 3
+    ) where Element == SetGame<T, U, V, W>.Card {
+        
+        filter { $0.location == .deck }
+            .prefix(count)
+            .map(\.id)
+            .forEach { self[id: $0].location = .dealt }
+    }
+    
+    func features<T, U, V, W>() -> [[AnyHashable]]
     where Element == SetGame<T, U, V, W>.Card.Content {
         [
             map(\.color),

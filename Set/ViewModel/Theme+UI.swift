@@ -94,7 +94,7 @@ extension SetGameViewModel.ThemedSetGame.Card {
                 .yellow
             }
         } else {
-            .clear
+            .white
         }
     }
 }
