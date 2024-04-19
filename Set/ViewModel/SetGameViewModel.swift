@@ -44,7 +44,7 @@ class SetGameViewModel: ObservableObject {
     
     var cards: [ThemedSetGame.Card] {
         model.cards
-            .filter { $0.state == .dealt }
+            .filter { $0.location == .dealt }
     }
     
     var isMatch: Bool? {

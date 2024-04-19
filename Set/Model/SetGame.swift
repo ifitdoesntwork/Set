@@ -40,31 +40,35 @@ where Color: Hashable,
         
         cards
             .indices[0..<12]
-            .forEach { cards[$0].state = .dealt }
+            .forEach { cards[$0].location = .dealt }
     }
     
-    private var chosenCards: [Card] {
+    private var selectedCards: [Card] {
         cards
-            .filter(\.isChosen)
+            .filter(\.isSelected)
+    }
+    
+    private var isSelectedEnough: Bool {
+        selectedCards.count == 3
     }
     
     var isMatch: Bool? {
-        guard 
-            chosenCards.count == 3
-        else {
-            return nil
-        }
-        
-        return chosenCards
-            .map(\.content)
-            .hashables()
-            .allSatisfy(\.isSet)
+        isSelectedEnough
+            ? selectedCards
+                .map(\.content)
+                .hashables()
+                .allSatisfy(\.isSet)
+            : nil
     }
     
     mutating func choose(_ card: Card) {
         cards
             .firstIndex { $0.id == card.id }
-            .map { cards[$0].isChosen = true }
+            .map {
+                isSelectedEnough
+                    ? print("ok")
+                    : cards[$0].isSelected.toggle()
+            }
     }
     
     struct Card: Identifiable {
@@ -76,14 +80,14 @@ where Color: Hashable,
             let number: Number
         }
         
-        enum State {
-            case inDeck
+        enum Location {
+            case deck
             case dealt
-            case discarded
+            case matched
         }
         
-        fileprivate(set) var state = State.inDeck
-        fileprivate(set) var isChosen = false
+        fileprivate(set) var location = Location.deck
+        fileprivate(set) var isSelected = false
         
         let content: Content
         let id = UUID().uuidString

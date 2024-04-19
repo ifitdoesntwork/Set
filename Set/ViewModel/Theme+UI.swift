@@ -84,7 +84,7 @@ extension SetGameViewModel.ThemedSetGame.Card {
         isMatch: Bool?
     ) -> SwiftUI.Color {
         
-        if isChosen {
+        if isSelected {
             switch isMatch {
             case .some(true):
                 .green
