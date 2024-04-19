@@ -42,20 +42,10 @@ where Color: Hashable,
             .deal(count: 12)
     }
     
-    private var selectedCards: [Card] {
-        cards
-            .filter(\.isSelected)
-    }
-    
-    private var dealCount: Int {
-        cards
-            .filter(\.isDealt)
-            .count
-    }
-    
     var isMatch: Bool? {
-        selectedCards.count == 3
-        ? selectedCards
+        cards.selected().count == 3
+        ? cards
+            .selected()
             .map(\.content)
             .features()
             .allSatisfy(\.isSet)
@@ -65,56 +55,39 @@ where Color: Hashable,
     mutating func choose(
         _ card: Card
     ) {
+        let selectionIds = cards
+            .selected()
+            .map(\.id)
+        
+        let isMatch = isMatch
+        
         switch isMatch {
         case .some(true):
-            processMatch(chosenCard: card)
-        case .some(false):
-            break
-        case .none:
-            cards[id: card.id]
-                .isSelected
-                .toggle()
-        }
-    }
-    
-    private mutating func processMatch(
-        chosenCard: Card
-    ) {
-        let selectionIndices = selectedCards
-            .map { card in
-                cards
-                    .firstIndex { $0.id == card.id }
-            }
-            .compactMap { $0 }
-        
-        let selectionIds = selectedCards
-            .map(\.id)
-        
-        let oldDealCount = dealCount
-        
-        selectedCards
-            .map(\.id)
-            .forEach {
-                cards[id: $0].location = .matched
-                cards[id: $0].isSelected = false
-            }
-        
-        cards
-            .deal()
-        
-        if dealCount == oldDealCount {
-            selectionIndices
+            selectionIds
                 .forEach {
-                    cards.swapAt(
-                        $0,
-                        cards
-                            .lastIndex(where: \.isDealt)!
-                    )
+                    cards[id: $0].location = .matched
                 }
-        }
-        
-        if !selectionIds.contains(chosenCard.id) {
-            choose(chosenCard)
+            
+            cards
+                .deal()
+            
+            fallthrough
+        case .some(false):
+            selectionIds
+                .forEach {
+                    cards[id: $0].isSelected = false
+                }
+            
+            fallthrough
+        case .none:
+            if !(
+                selectionIds.contains(card.id)
+                && isMatch == .some(true)
+            ) {
+                cards[id: card.id]
+                    .isSelected
+                    .toggle()
+            }
         }
     }
 }
@@ -141,10 +114,6 @@ extension SetGame {
         
         let content: Content
         let id = UUID().uuidString
-        
-        var isDealt: Bool {
-            location == .dealt
-        }
     }
 }
 
@@ -166,14 +135,40 @@ private extension Array {
         }
     }
     
+    func selected<T, U, V, W>() -> [SetGame<T, U, V, W>.Card]
+    where Element == SetGame<T, U, V, W>.Card {
+        
+        filter(\.isSelected)
+    }
+    
     mutating func deal<T, U, V, W>(
         count: Int = 3
     ) where Element == SetGame<T, U, V, W>.Card {
         
-        filter { $0.location == .deck }
+        let cards = filter { $0.location == .deck }
             .prefix(count)
+        
+        cards
             .map(\.id)
             .forEach { self[id: $0].location = .dealt }
+        
+        if cards.count == selected().count {
+            
+            selected()
+                .compactMap { card in
+                    firstIndex { $0.id == card.id }
+                }
+                .forEach { selectedIndex in
+                    
+                    lastIndex { $0.location == .dealt }
+                        .map { lastDealtIndex in
+                            swapAt(
+                                selectedIndex,
+                                lastDealtIndex
+                            )
+                        }
+                }
+        }
     }
     
     func features<T, U, V, W>() -> [[AnyHashable]]
