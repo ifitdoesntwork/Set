@@ -11,10 +11,12 @@ struct SetGameView: View {
     @ObservedObject var viewModel: SetGameViewModel
     
     var body: some View {
+        buttons
+        
         AspectVGrid(
             viewModel.cards,
             aspectRatio: Constants.aspectRatio,
-            maxColumns: Constants.maxColumns
+            minWidth: Constants.minWidth
         ) { card in
             
             CardView(card: card, isMatch: viewModel.isMatch)
@@ -25,8 +27,21 @@ struct SetGameView: View {
                 }
         }
         .padding()
-        
+    }
+    
+    private var buttons: some View {
         HStack {
+            Button {
+                viewModel.reset()
+            } label: {
+                Image(
+                    systemName: "arrow.counterclockwise.circle.fill"
+                )
+                .font(.largeTitle)
+            }
+            
+            Spacer()
+            
             Button {
                 viewModel.deal()
             } label: {
@@ -37,11 +52,12 @@ struct SetGameView: View {
             }
             .disabled(viewModel.deckIsEmpty)
         }
+        .padding(.horizontal)
     }
     
     private struct Constants {
         static let aspectRatio: CGFloat = 2/3
-        static let maxColumns = 5
+        static let minWidth: CGFloat = 72
         static let cardPadding: CGFloat = 4
     }
 }

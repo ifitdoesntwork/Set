@@ -49,7 +49,7 @@ extension Shape {
         case .solid:
             self
         case .striped:
-            opacity(0.5)
+            opacity(0.3)
         case .open:
             stroke(lineWidth: 4)
                 .padding(4)

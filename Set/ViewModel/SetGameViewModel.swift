@@ -34,13 +34,9 @@ class SetGameViewModel: ObservableObject {
         }
     }
     
-    private var theme: Theme
-    @Published private var model: ThemedSetGame
-    
-    init() {
-        theme = .classic
-        model = Self.createGame(themed: theme)
-    }
+    @Published private var model = SetGameViewModel.createGame(
+        themed: .classic
+    )
     
     var cards: [ThemedSetGame.Card] {
         model.cards
@@ -68,5 +64,11 @@ class SetGameViewModel: ObservableObject {
     func deal() {
         model
             .deal()
+    }
+    
+    func reset() {
+        model = Self.createGame(
+            themed: .classic
+        )
     }
 }

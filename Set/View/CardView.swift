@@ -18,22 +18,7 @@ struct CardView: View {
             / geometry.size.height
             
             ZStack {
-                let base = RoundedRectangle(
-                    cornerRadius: Constants.cornerRadius
-                )
-                
                 base
-                    .foregroundStyle(
-                        card
-                            .backgroundColor(isMatch: isMatch)
-                            .opacity(0.3)
-                    )
-                
-                base
-                    .strokeBorder(
-                        lineWidth: Constants.lineWidth
-                    )
-                    .foregroundStyle(.gray)
                 
                 VStack {
                     ForEach(
@@ -55,6 +40,26 @@ struct CardView: View {
                 .padding(Constants.padding)
             }
         }
+    }
+    
+    @ViewBuilder
+    private var base: some View {
+        let base = RoundedRectangle(
+            cornerRadius: Constants.cornerRadius
+        )
+        
+        base
+            .foregroundStyle(
+                card
+                    .backgroundColor(isMatch: isMatch)
+                    .opacity(0.3)
+            )
+        
+        base
+            .strokeBorder(
+                lineWidth: Constants.lineWidth
+            )
+            .foregroundStyle(.gray)
     }
     
     private struct Constants {

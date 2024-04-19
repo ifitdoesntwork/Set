@@ -8,20 +8,20 @@
 import SwiftUI
 
 struct AspectVGrid<Item: Identifiable, ItemView: View>: View {
-    let items: [Item]
-    let aspectRatio: CGFloat
-    let maxColumns: Int
-    let content: (Item) -> ItemView
+    private let items: [Item]
+    private let aspectRatio: CGFloat
+    private let minWidth: CGFloat
+    private let content: (Item) -> ItemView
     
     init(
         _ items: [Item],
         aspectRatio: CGFloat = 1,
-        maxColumns: Int = .max,
+        minWidth: CGFloat = .zero,
         @ViewBuilder content: @escaping (Item) -> ItemView
     ) {
         self.items = items
         self.aspectRatio = aspectRatio
-        self.maxColumns = maxColumns
+        self.minWidth = minWidth
         self.content = content
     }
     
@@ -35,7 +35,7 @@ struct AspectVGrid<Item: Identifiable, ItemView: View>: View {
                     size: geometry.size,
                     atAspectRatio: aspectRatio
                 ),
-                geometry.size.width / CGFloat(maxColumns)
+                minWidth
             )
             
             ScrollView {
