@@ -42,16 +42,6 @@ where Color: Hashable,
             .deal(count: 12)
     }
     
-    var isMatch: Bool? {
-        cards.selected().count == 3
-        ? cards
-            .selected()
-            .map(\.content)
-            .features()
-            .allSatisfy(\.isSet)
-        : nil
-    }
-    
     mutating func choose(
         _ card: Card
     ) {
@@ -59,15 +49,11 @@ where Color: Hashable,
             .selected()
             .map(\.id)
         
-        let isMatch = isMatch
+        let isMatch = cards
+            .isMatch()
         
         switch isMatch {
         case .some(true):
-            selectionIds
-                .forEach {
-                    cards[id: $0].location = .matched
-                }
-            
             cards
                 .deal()
             
@@ -89,6 +75,11 @@ where Color: Hashable,
                     .toggle()
             }
         }
+    }
+    
+    mutating func deal() {
+        cards
+            .deal()
     }
 }
 
@@ -145,28 +136,34 @@ private extension Array {
         count: Int = 3
     ) where Element == SetGame<T, U, V, W>.Card {
         
-        let cards = filter { $0.location == .deck }
+        let cards = deck()
             .prefix(count)
         
         cards
             .map(\.id)
             .forEach { self[id: $0].location = .dealt }
         
-        if cards.count == selected().count {
+        if isMatch() == true {
+            let selected = selected()
             
-            selected()
+            selected
                 .compactMap { card in
                     firstIndex { $0.id == card.id }
                 }
                 .forEach { selectedIndex in
+                    self[selectedIndex].location = .matched
+                    self[selectedIndex].isSelected = false
                     
-                    lastIndex { $0.location == .dealt }
-                        .map { lastDealtIndex in
-                            swapAt(
-                                selectedIndex,
-                                lastDealtIndex
-                            )
-                        }
+                    if cards.count == selected.count {
+                        
+                        lastIndex { $0.location == .dealt }
+                            .map { lastDealtIndex in
+                                swapAt(
+                                    selectedIndex,
+                                    lastDealtIndex
+                                )
+                            }
+                    }
                 }
         }
     }
@@ -179,6 +176,25 @@ private extension Array {
             map(\.shading),
             map(\.shape)
         ]
+    }
+}
+
+extension Array {
+    
+    func deck<T, U, V, W>() -> [SetGame<T, U, V, W>.Card]
+    where Element == SetGame<T, U, V, W>.Card {
+        
+        filter { $0.location == .deck }
+    }
+    
+    func isMatch<T, U, V, W>() -> Bool?
+    where Element == SetGame<T, U, V, W>.Card {
+        selected().count == 3
+            ? selected()
+                .map(\.content)
+                .features()
+                .allSatisfy(\.isSet)
+            : nil
     }
 }
 

@@ -25,6 +25,18 @@ struct SetGameView: View {
                 }
         }
         .padding()
+        
+        HStack {
+            Button {
+                viewModel.deal()
+            } label: {
+                Image(
+                    systemName: "rectangle.stack.fill.badge.plus"
+                )
+                .font(.largeTitle)
+            }
+            .disabled(viewModel.deckIsEmpty)
+        }
     }
     
     private struct Constants {

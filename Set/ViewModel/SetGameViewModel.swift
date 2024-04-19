@@ -47,8 +47,15 @@ class SetGameViewModel: ObservableObject {
             .filter { $0.location == .dealt }
     }
     
+    var deckIsEmpty: Bool {
+        model.cards
+            .deck()
+            .isEmpty
+    }
+    
     var isMatch: Bool? {
-        model.isMatch
+        model.cards
+            .isMatch()
     }
     
     func choose(
@@ -56,5 +63,10 @@ class SetGameViewModel: ObservableObject {
     ) {
         model
             .choose(card)
+    }
+    
+    func deal() {
+        model
+            .deal()
     }
 }
