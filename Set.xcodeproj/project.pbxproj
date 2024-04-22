@@ -17,6 +17,7 @@
 		92A3AC262BD0E8D100623609 /* CardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A3AC252BD0E8D100623609 /* CardView.swift */; };
 		92A3AC292BD0E93100623609 /* SetGameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A3AC282BD0E93100623609 /* SetGameView.swift */; };
 		92A3AC2B2BD0F4E500623609 /* AspectVGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A3AC2A2BD0F4E500623609 /* AspectVGrid.swift */; };
+		92D37E202BD6668C009DA398 /* Algorithms in Frameworks */ = {isa = PBXBuildFile; productRef = 92D37E1F2BD6668C009DA398 /* Algorithms */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -38,6 +39,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				92D37E202BD6668C009DA398 /* Algorithms in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -133,6 +135,9 @@
 			dependencies = (
 			);
 			name = Set;
+			packageProductDependencies = (
+				92D37E1F2BD6668C009DA398 /* Algorithms */,
+			);
 			productName = Set;
 			productReference = 92A3AC022BCF895B00623609 /* Set.app */;
 			productType = "com.apple.product-type.application";
@@ -161,6 +166,9 @@
 				Base,
 			);
 			mainGroup = 92A3ABF92BCF895B00623609;
+			packageReferences = (
+				92D37E1E2BD6668C009DA398 /* XCRemoteSwiftPackageReference "swift-algorithms" */,
+			);
 			productRefGroup = 92A3AC032BCF895B00623609 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -400,6 +408,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		92D37E1E2BD6668C009DA398 /* XCRemoteSwiftPackageReference "swift-algorithms" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-algorithms.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.2.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		92D37E1F2BD6668C009DA398 /* Algorithms */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 92D37E1E2BD6668C009DA398 /* XCRemoteSwiftPackageReference "swift-algorithms" */;
+			productName = Algorithms;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 92A3ABFA2BCF895B00623609 /* Project object */;
 }

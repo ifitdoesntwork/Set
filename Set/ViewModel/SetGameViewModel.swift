@@ -51,6 +51,7 @@ class SetGameViewModel: ObservableObject {
     
     var isMatch: Bool? {
         model.cards
+            .selected()
             .isMatch()
     }
     

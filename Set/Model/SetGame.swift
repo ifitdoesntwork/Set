@@ -5,6 +5,7 @@
 //  Created by Denis Avdeev on 17.04.2024.
 //
 
+import Algorithms
 import Foundation
 
 struct SetGame<Color, Shape, Shading, Number>
@@ -52,6 +53,7 @@ where Color: Hashable,
             .map(\.id)
         
         let isMatch = cards
+            .selected()
             .isMatch()
         
         switch isMatch {
@@ -83,7 +85,9 @@ where Color: Hashable,
     
     private mutating func keepScore() {
         guard
-            let isMatch = cards.isMatch()
+            let isMatch = cards
+                .selected()
+                .isMatch()
         else {
             return
         }
@@ -92,12 +96,16 @@ where Color: Hashable,
             let setFindingTime = Date()
                 .timeIntervalSince(setFindingStart)
             
-            score += Int(max(
-                200 - setFindingTime,
+            score += max(
+                200 - Int(setFindingTime),
                 .zero
-            ))
+            )
         } else {
-            score -= 100
+            let hasSet = cards
+                .filter { $0.location == .dealt }
+                .hasSet()
+            
+            score -= hasSet ? 200 : 100
         }
     }
     
@@ -150,12 +158,6 @@ private extension Array {
         }
     }
     
-    func selected<T, U, V, W>() -> [SetGame<T, U, V, W>.Card]
-    where Element == SetGame<T, U, V, W>.Card {
-        
-        filter(\.isSelected)
-    }
-    
     mutating func deal<T, U, V, W>(
         count: Int = 3
     ) where Element == SetGame<T, U, V, W>.Card {
@@ -167,7 +169,7 @@ private extension Array {
             .map(\.id)
             .forEach { self[id: $0].location = .dealt }
         
-        if isMatch() == true {
+        if selected().isMatch() == true {
             let selected = selected()
             
             selected
@@ -201,6 +203,13 @@ private extension Array {
             map(\.shape)
         ]
     }
+    
+    func hasSet<T, U, V, W>() -> Bool
+    where Element == SetGame<T, U, V, W>.Card {
+        combinations(ofCount: 3)
+            .first { $0.isMatch() == true }
+        != nil
+    }
 }
 
 extension Array {
@@ -211,12 +220,17 @@ extension Array {
         filter { $0.location == .deck }
     }
     
+    func selected<T, U, V, W>() -> [SetGame<T, U, V, W>.Card]
+    where Element == SetGame<T, U, V, W>.Card {
+        
+        filter(\.isSelected)
+    }
+    
     func isMatch<T, U, V, W>() -> Bool?
     where Element == SetGame<T, U, V, W>.Card {
         
-        selected().count == 3
-            ? selected()
-                .map(\.content)
+        count == 3
+            ? map(\.content)
                 .features()
                 .allSatisfy(\.isSet)
             : nil
