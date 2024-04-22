@@ -15,6 +15,7 @@ where Color: Hashable,
 {
     private(set) var cards: [Card]
     private(set) var score = 0
+    private var setFindingStart = Date()
     
     init(
         colorCount: Int,
@@ -77,8 +78,26 @@ where Color: Hashable,
             }
         }
         
-        if let isMatch = cards.isMatch() {
-            score += isMatch ? 2 : -1
+        keepScore()
+    }
+    
+    private mutating func keepScore() {
+        guard
+            let isMatch = cards.isMatch()
+        else {
+            return
+        }
+        
+        if isMatch {
+            let setFindingTime = Date()
+                .timeIntervalSince(setFindingStart)
+            
+            score += Int(max(
+                200 - setFindingTime,
+                .zero
+            ))
+        } else {
+            score -= 100
         }
     }
     
@@ -194,6 +213,7 @@ extension Array {
     
     func isMatch<T, U, V, W>() -> Bool?
     where Element == SetGame<T, U, V, W>.Card {
+        
         selected().count == 3
             ? selected()
                 .map(\.content)
