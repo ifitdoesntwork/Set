@@ -14,6 +14,7 @@ where Color: Hashable,
       Number: Hashable
 {
     private(set) var cards: [Card]
+    private(set) var score = 0
     
     init(
         colorCount: Int,
@@ -74,6 +75,10 @@ where Color: Hashable,
                     .isSelected
                     .toggle()
             }
+        }
+        
+        if let isMatch = cards.isMatch() {
+            score += isMatch ? 2 : -1
         }
     }
     

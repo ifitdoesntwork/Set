@@ -54,6 +54,10 @@ class SetGameViewModel: ObservableObject {
             .isMatch()
     }
     
+    var score: Int {
+        model.score
+    }
+    
     func choose(
         _ card: ThemedSetGame.Card
     ) {

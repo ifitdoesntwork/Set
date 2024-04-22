@@ -11,7 +11,7 @@ struct SetGameView: View {
     @ObservedObject var viewModel: SetGameViewModel
     
     var body: some View {
-        buttons
+        panel
         
         AspectVGrid(
             viewModel.cards,
@@ -29,7 +29,7 @@ struct SetGameView: View {
         .padding()
     }
     
-    private var buttons: some View {
+    private var panel: some View {
         HStack {
             Button {
                 viewModel.reset()
@@ -39,6 +39,11 @@ struct SetGameView: View {
                 )
                 .font(.largeTitle)
             }
+            
+            Spacer()
+            
+            Text("Score: \(viewModel.score)")
+                .font(.title)
             
             Spacer()
             
