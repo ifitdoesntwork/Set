@@ -42,8 +42,16 @@ struct SetGameView: View {
             
             Spacer()
             
-            Text("Score: \(viewModel.score)")
-                .font(.title)
+            let isMatch = viewModel.isMatch == true
+            
+            Button {
+                viewModel.cheat()
+            } label: {
+                Text("Score: \(viewModel.score)")
+                    .font(.title)
+            }
+            .foregroundStyle(isMatch ? .red : .blue)
+            .disabled(isMatch)
             
             Spacer()
             

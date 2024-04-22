@@ -102,8 +102,8 @@ where Color: Hashable,
             )
         } else {
             let hasSet = cards
-                .filter { $0.location == .dealt }
-                .hasSet()
+                .firstAvailableSet()
+            != nil
             
             score -= hasSet ? 200 : 100
         }
@@ -112,6 +112,33 @@ where Color: Hashable,
     mutating func deal() {
         cards
             .deal()
+    }
+    
+    mutating func cheat() {
+        guard
+            let availableSet = cards
+                .firstAvailableSet(),
+            let firstCard = availableSet
+                .first
+        else {
+            return
+        }
+        
+        cards
+            .selected()
+            .map(\.id)
+            .forEach {
+                cards[id: $0].isSelected = false
+            }
+        
+        availableSet
+            .dropFirst()
+            .map(\.id)
+            .forEach {
+                cards[id: $0].isSelected = true
+            }
+        
+        choose(firstCard)
     }
 }
 
@@ -204,11 +231,12 @@ private extension Array {
         ]
     }
     
-    func hasSet<T, U, V, W>() -> Bool
+    func firstAvailableSet<T, U, V, W>() -> [SetGame<T, U, V, W>.Card]?
     where Element == SetGame<T, U, V, W>.Card {
-        combinations(ofCount: 3)
+        
+        filter { $0.location == .dealt }
+            .combinations(ofCount: 3)
             .first { $0.isMatch() == true }
-        != nil
     }
 }
 

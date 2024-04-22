@@ -76,4 +76,9 @@ class SetGameViewModel: ObservableObject {
             themed: .classic
         )
     }
+    
+    func cheat() {
+        model
+            .cheat()
+    }
 }
