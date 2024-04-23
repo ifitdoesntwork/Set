@@ -45,48 +45,49 @@ where Color: Hashable,
             .deal(count: 12)
     }
     
+    private(set) var selection: [Card] {
+        get {
+            cards
+                .selected()
+        }
+        set {
+            if selection.isMatch() == true {
+                cards
+                    .deal()
+            }
+            
+            cards
+                .forEach {
+                    cards[identifiedAs: $0].isSelected = newValue
+                        .contains($0)
+                }
+        }
+    }
+    
     mutating func choose(
         _ card: Card
     ) {
-        let selectionIds = cards
-            .selected()
-            .map(\.id)
-        
-        let isMatch = cards
-            .selected()
+        let isMatch = selection
             .isMatch()
         
-        switch isMatch {
-        case .some(true):
-            cards
-                .deal()
-            
-            fallthrough
-        case .some(false):
-            selectionIds
-                .forEach {
-                    cards[id: $0].isSelected = false
-                }
-            
-            fallthrough
-        case .none:
-            if !(
-                selectionIds.contains(card.id)
-                && isMatch == .some(true)
-            ) {
-                cards[id: card.id]
-                    .isSelected
-                    .toggle()
+        selection = selection
+            .filter {
+                isMatch == nil 
+                && $0.id != card.id
             }
-        }
+        + (
+            !selection.contains(card)
+            || isMatch == false
+                ? [card]
+                : []
+        )
         
         keepScore()
     }
     
     private mutating func keepScore() {
         guard
-            let isMatch = cards
-                .selected()
+            let isMatch = selection
                 .isMatch()
         else {
             return
@@ -100,6 +101,8 @@ where Color: Hashable,
                 200 - Int(setFindingTime),
                 .zero
             )
+            
+            setFindingStart = Date()
         } else {
             let hasSet = cards
                 .firstAvailableSet()
@@ -115,30 +118,9 @@ where Color: Hashable,
     }
     
     mutating func cheat() {
-        guard
-            let availableSet = cards
-                .firstAvailableSet(),
-            let firstCard = availableSet
-                .first
-        else {
-            return
-        }
-        
         cards
-            .selected()
-            .map(\.id)
-            .forEach {
-                cards[id: $0].isSelected = false
-            }
-        
-        availableSet
-            .dropFirst()
-            .map(\.id)
-            .forEach {
-                cards[id: $0].isSelected = true
-            }
-        
-        choose(firstCard)
+            .firstAvailableSet()
+            .map { selection = $0 }
     }
 }
 
@@ -163,26 +145,35 @@ extension SetGame {
         fileprivate(set) var isSelected = false
         
         let content: Content
-        let id = UUID().uuidString
+        let id = UUID()
     }
 }
 
 private extension Array {
     
     subscript<T, U, V, W>(
-        id id: String
-    ) -> SetGame<T, U, V, W>.Card!
+        identifiedAs card: Element
+    ) -> Element!
     where Element == SetGame<T, U, V, W>.Card {
         get {
-            first { $0.id == id }
+            first { $0.id == card.id }
         }
         set {
-            firstIndex { $0.id == id }
+            firstIndex { $0.id == card.id }
                 .map { index in
                     newValue
                         .map { self[index] = $0 }
                 }
         }
+    }
+    
+    func contains<T, U, V, W>(
+        _ card: Element
+    ) -> Bool
+    where Element == SetGame<T, U, V, W>.Card {
+        
+        map(\.id)
+            .contains(card.id)
     }
     
     mutating func deal<T, U, V, W>(
@@ -193,8 +184,9 @@ private extension Array {
             .prefix(count)
         
         cards
-            .map(\.id)
-            .forEach { self[id: $0].location = .dealt }
+            .forEach {
+                self[identifiedAs: $0].location = .dealt
+            }
         
         if selected().isMatch() == true {
             let selected = selected()
@@ -231,7 +223,7 @@ private extension Array {
         ]
     }
     
-    func firstAvailableSet<T, U, V, W>() -> [SetGame<T, U, V, W>.Card]?
+    func firstAvailableSet<T, U, V, W>() -> [Element]?
     where Element == SetGame<T, U, V, W>.Card {
         
         filter { $0.location == .dealt }
@@ -242,13 +234,13 @@ private extension Array {
 
 extension Array {
     
-    func deck<T, U, V, W>() -> [SetGame<T, U, V, W>.Card]
+    func deck<T, U, V, W>() -> [Element]
     where Element == SetGame<T, U, V, W>.Card {
         
         filter { $0.location == .deck }
     }
     
-    func selected<T, U, V, W>() -> [SetGame<T, U, V, W>.Card]
+    func selected<T, U, V, W>() -> [Element]
     where Element == SetGame<T, U, V, W>.Card {
         
         filter(\.isSelected)
