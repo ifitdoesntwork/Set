@@ -15,16 +15,20 @@ where Color: Hashable,
       Number: Hashable
 {
     private(set) var cards: [Card]
-    private(set) var score = 0
-    private var setFindingStart = Date()
+    private(set) var players: [Player]
+    private(set) var claims = [Claim]()
     
     init(
+        playersCount: Int,
         colorCount: Int,
         shapeCount: Int,
         shadingCount: Int,
         numberCount: Int,
         cardContentFactory: (Int, Int, Int, Int) -> Card.Content
     ) {
+        players = (0..<playersCount)
+            .map { _ in .init() }
+        
         cards = (0..<colorCount).flatMap { colorIndex in
             (0..<shapeCount).flatMap { shapeIndex in
                 (0..<shadingCount).flatMap { shadingIndex in
@@ -64,15 +68,26 @@ where Color: Hashable,
         }
     }
     
+    var activeClaim: Claim? {
+        claims
+            .first { $0.end > .now }
+    }
+    
     mutating func choose(
         _ card: Card
     ) {
+        guard
+            let claim = activeClaim
+        else {
+            return
+        }
+        
         let isMatch = selection
             .isMatch()
         
         selection = selection
             .filter {
-                isMatch == nil 
+                isMatch == nil
                 && $0.id != card.id
             }
         + (
@@ -83,32 +98,42 @@ where Color: Hashable,
         )
         
         keepScore()
+        
+        if selection.isMatch() != nil {
+            endClaim(claim)
+        }
     }
     
     private mutating func keepScore() {
         guard
             let isMatch = selection
-                .isMatch()
+                .isMatch(),
+            let player = players
+                .first(where: {
+                    $0.id == activeClaim?.playerId
+                })
         else {
             return
         }
         
         if isMatch {
             let setFindingTime = Date()
-                .timeIntervalSince(setFindingStart)
+                .timeIntervalSince(
+                    players[identifiedAs: player].setFindingStart
+                )
             
-            score += max(
-                200 - Int(setFindingTime),
+            players[identifiedAs: player].score += max(
+                20 - Int(setFindingTime / 5),
                 .zero
             )
             
-            setFindingStart = Date()
+            players[identifiedAs: player].setFindingStart = .now
         } else {
             let hasSet = cards
                 .firstAvailableSet()
             != nil
             
-            score -= hasSet ? 200 : 100
+            players[identifiedAs: player].score -= hasSet ? 20 : 10
         }
     }
     
@@ -123,6 +148,52 @@ where Color: Hashable,
             .map { selection = $0 }
     }
 }
+
+// MARK: - Claiming
+
+extension SetGame {
+    
+    mutating func claim(
+        by player: Player
+    ) {
+        claims
+            .append(.init(
+                end: .now.addingTimeInterval(Constants.claimTime),
+                playerId: player.id
+            ))
+    }
+    
+    mutating func endClaim(
+        _ claim: Claim
+    ) {
+        if
+            let claimEnd = claims[identifiedAs: claim]?.end,
+            (
+                selection.isMatch() == false
+                && claimEnd > .now
+            )
+            || abs(Date().timeIntervalSince(claimEnd)) < 0.01
+        {
+            claims[identifiedAs: claim].penaltyEnd = .now
+                .addingTimeInterval(Constants.penaltyTime)
+        }
+        
+        claims[identifiedAs: claim]?.end = .now
+    }
+    
+    mutating func endPenalty(
+        forClaim claim: Claim
+    ) {
+        claims[identifiedAs: claim]?.penaltyEnd = nil
+    }
+    
+    struct Constants {
+        static var claimTime: TimeInterval { 5 }
+        static var penaltyTime: TimeInterval { 10 }
+    }
+}
+
+// MARK: - Models
 
 extension SetGame {
     
@@ -147,19 +218,34 @@ extension SetGame {
         let content: Content
         let id = UUID()
     }
+    
+    struct Player: Identifiable {
+        var score = 0
+        var setFindingStart = Date()
+        let id = UUID()
+    }
+    
+    struct Claim: Identifiable {
+        var end: Date
+        var penaltyEnd: Date?
+        let playerId: UUID
+        let id = UUID()
+    }
 }
+
+// MARK: - Utilities
 
 private extension Array {
     
-    subscript<T, U, V, W>(
-        identifiedAs card: Element
+    subscript(
+        identifiedAs element: Element
     ) -> Element!
-    where Element == SetGame<T, U, V, W>.Card {
+    where Element: Identifiable {
         get {
-            first { $0.id == card.id }
+            first { $0.id == element.id }
         }
         set {
-            firstIndex { $0.id == card.id }
+            firstIndex { $0.id == element.id }
                 .map { index in
                     newValue
                         .map { self[index] = $0 }

@@ -16,7 +16,7 @@ extension Theme.Color {
         case .green:
             .green
         case .purple:
-            .blue
+            .purple
         }
     }
 }

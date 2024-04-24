@@ -16,10 +16,13 @@ class SetGameViewModel: ObservableObject {
         Theme.Number
     >
     
+    typealias Constants = ThemedSetGame.Constants
+    
     private static func createGame(
         themed theme: Theme
     ) -> ThemedSetGame {
         .init(
+            playersCount: 2,
             colorCount: theme.colors.count,
             shapeCount: theme.shapes.count,
             shadingCount: theme.shadings.count,
@@ -54,8 +57,47 @@ class SetGameViewModel: ObservableObject {
             .isMatch()
     }
     
-    var score: Int {
-        model.score
+    var players: [ThemedSetGame.Player] {
+        model.players
+    }
+    
+    var canClaim: Bool {
+        model.activeClaim == nil
+    }
+    
+    func lastClaim(
+        by player: ThemedSetGame.Player
+    ) -> ThemedSetGame.Claim? {
+        
+        model.claims
+            .last {
+                $0.playerId == player.id
+                && (
+                    $0.end > .now
+                    || $0.penaltyEnd ?? .now > .now
+                )
+            }
+    }
+    
+    func claim(
+        by player: ThemedSetGame.Player
+    ) {
+        model
+            .claim(by: player)
+        
+        let claim = model.claims.last!
+        
+        Timer.scheduledTimer(
+            withTimeInterval: Constants.claimTime,
+            repeats: false
+        ) { [weak self] _ in
+            
+            self?.model
+                .endClaim(claim)
+            
+            self?
+                .penalize(claim: claim)
+        }
     }
     
     func choose(
@@ -63,6 +105,12 @@ class SetGameViewModel: ObservableObject {
     ) {
         model
             .choose(card)
+        
+        if model.selection.isMatch() == false {
+            penalize(
+                claim: model.claims.last!
+            )
+        }
     }
     
     func deal() {
@@ -79,5 +127,18 @@ class SetGameViewModel: ObservableObject {
     func cheat() {
         model
             .cheat()
+    }
+    
+    private func penalize(
+        claim: ThemedSetGame.Claim
+    ) {
+        Timer.scheduledTimer(
+            withTimeInterval: Constants.penaltyTime,
+            repeats: false
+        ) { [weak self] _ in
+            
+            self?.model
+                .endPenalty(forClaim: claim)
+        }
     }
 }

@@ -11,7 +11,9 @@ struct SetGameView: View {
     @ObservedObject var viewModel: SetGameViewModel
     
     var body: some View {
-        panel
+        
+        panel(for: viewModel.players[0])
+            .rotationEffect(.radians(.pi))
         
         AspectVGrid(
             viewModel.cards,
@@ -26,46 +28,86 @@ struct SetGameView: View {
                         .choose(card)
                 }
         }
-        .padding()
+        .padding(.horizontal)
+        
+        panel(for: viewModel.players[1])
     }
     
-    private var panel: some View {
+    private func panel(
+        for player: SetGameViewModel.ThemedSetGame.Player
+    ) -> some View {
+        
         HStack {
-            Button {
-                viewModel.reset()
-            } label: {
-                Image(
-                    systemName: "arrow.counterclockwise.circle.fill"
-                )
-                .font(.largeTitle)
-            }
+            
+            commonControls(for: player)
             
             Spacer()
             
-            let isMatch = viewModel.isMatch == true
+            let claim = viewModel.lastClaim(by: player)
             
-            Button {
-                viewModel.cheat()
-            } label: {
-                Text("Score: \(viewModel.score)")
-                    .font(.title)
+            if let claim {
+                Text(
+                    (claim.penaltyEnd ?? claim.end) + 0.5,
+                    style: .timer
+                )
+                .foregroundStyle(
+                    claim.penaltyEnd == nil ? .green : .red
+                )
+                .font(.title)
+                .monospacedDigit()
             }
-            .foregroundStyle(isMatch ? .red : .blue)
-            .disabled(isMatch)
-            
-            Spacer()
             
             Button {
-                viewModel.deal()
+                viewModel
+                    .claim(by: player)
             } label: {
                 Image(
-                    systemName: "rectangle.stack.fill.badge.plus"
+                    systemName: "exclamationmark.circle.fill"
                 )
                 .font(.largeTitle)
             }
-            .disabled(viewModel.deckIsEmpty)
+            .disabled(
+                !viewModel.canClaim
+                || claim?.penaltyEnd != nil
+            )
         }
         .padding(.horizontal)
+    }
+    
+    @ViewBuilder
+    private func commonControls(
+        for player: SetGameViewModel.ThemedSetGame.Player
+    ) -> some View {
+        
+        Button {
+            viewModel.deal()
+        } label: {
+            Image(
+                systemName: "rectangle.stack.fill.badge.plus"
+            )
+            .font(.largeTitle)
+        }
+        .disabled(viewModel.deckIsEmpty)
+        
+        Button {
+            viewModel.reset()
+        } label: {
+            Image(
+                systemName: "arrow.counterclockwise.circle.fill"
+            )
+            .font(.largeTitle)
+        }
+        
+        let isMatch = viewModel.isMatch == true
+        
+        Button {
+            viewModel.cheat()
+        } label: {
+            Text("Score: \(player.score)")
+                .font(.title)
+        }
+        .foregroundStyle(isMatch ? .black : .blue)
+        .disabled(isMatch)
     }
     
     private struct Constants {

@@ -53,7 +53,8 @@ struct AspectVGrid<Item: Identifiable, ItemView: View>: View {
                                 contentMode: .fit
                             )
                     }
-            }
+                }
+                .frame(minHeight: geometry.size.height)
             }
         }
     }
