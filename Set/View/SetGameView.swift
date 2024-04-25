@@ -21,12 +21,16 @@ struct SetGameView: View {
             minWidth: Constants.minWidth
         ) { card in
             
-            CardView(card: card, isMatch: viewModel.isMatch)
-                .padding(Constants.cardPadding)
-                .onTapGesture {
-                    viewModel
-                        .choose(card)
-                }
+            CardView(
+                card: card,
+                isMatch: viewModel.isMatch,
+                theme: viewModel.theme
+            )
+            .padding(Constants.cardPadding)
+            .onTapGesture {
+                viewModel
+                    .choose(card)
+            }
         }
         .padding(.horizontal)
         
@@ -34,7 +38,7 @@ struct SetGameView: View {
     }
     
     private func panel(
-        for player: SetGameViewModel.ThemedSetGame.Player
+        for player: SetGame.Player
     ) -> some View {
         
         HStack {
@@ -76,7 +80,7 @@ struct SetGameView: View {
     
     @ViewBuilder
     private func commonControls(
-        for player: SetGameViewModel.ThemedSetGame.Player
+        for player: SetGame.Player
     ) -> some View {
         
         Button {

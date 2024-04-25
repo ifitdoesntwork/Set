@@ -8,40 +8,34 @@
 import Algorithms
 import Foundation
 
-struct SetGame<Color, Shape, Shading, Number>
-where Color: Hashable,
-      Shape: Hashable,
-      Shading: Hashable,
-      Number: Hashable
-{
+struct SetGame {
     private(set) var cards: [Card]
     private(set) var players: [Player]
     private(set) var claims = [Claim]()
     
     init(
-        playersCount: Int,
-        colorCount: Int,
-        shapeCount: Int,
-        shadingCount: Int,
-        numberCount: Int,
-        cardContentFactory: (Int, Int, Int, Int) -> Card.Content
+        playersCount: Int
     ) {
         players = (0..<playersCount)
             .map { _ in .init() }
         
-        cards = (0..<colorCount).flatMap { colorIndex in
-            (0..<shapeCount).flatMap { shapeIndex in
-                (0..<shadingCount).flatMap { shadingIndex in
-                    (0..<numberCount).map { numberIndex in
-                        .init(content: cardContentFactory(
-                            colorIndex,
-                            shapeIndex,
-                            shadingIndex,
-                            numberIndex
-                        ))
-                    }
-                }
-            }
+        cards = product(
+            TriState.allCases,
+            product(
+                TriState.allCases,
+                product(
+                    TriState.allCases,
+                    TriState.allCases
+                )
+            )
+        )
+        .map {
+            .init(content: [
+                $0.0,
+                $0.1.0,
+                $0.1.1.0,
+                $0.1.1.1
+            ])
         }
         .shuffled()
         
@@ -51,11 +45,10 @@ where Color: Hashable,
     
     private(set) var selection: [Card] {
         get {
-            cards
-                .selected()
+            cards.selected
         }
         set {
-            if selection.isMatch() == true {
+            if selection.isMatch == true {
                 cards
                     .deal()
             }
@@ -82,8 +75,7 @@ where Color: Hashable,
             return
         }
         
-        let isMatch = selection
-            .isMatch()
+        let isMatch = selection.isMatch
         
         selection = selection
             .filter {
@@ -99,7 +91,7 @@ where Color: Hashable,
         
         keepScore()
         
-        if selection.isMatch() != nil {
+        if selection.isMatch != nil {
             endClaim(claim)
         }
     }
@@ -107,7 +99,7 @@ where Color: Hashable,
     private mutating func keepScore() {
         guard
             let isMatch = selection
-                .isMatch(),
+                .isMatch,
             let player = players
                 .first(where: {
                     $0.id == activeClaim?.playerId
@@ -129,11 +121,10 @@ where Color: Hashable,
             
             players[identifiedAs: player].setFindingStart = .now
         } else {
-            let hasSet = cards
-                .firstAvailableSet()
-            != nil
+            let hasSet = cards.firstAvailableSet != nil
             
-            players[identifiedAs: player].score -= hasSet ? 20 : 10
+            players[identifiedAs: player].score -= hasSet 
+                ? 20 : 10
         }
     }
     
@@ -144,7 +135,7 @@ where Color: Hashable,
     
     mutating func cheat() {
         cards
-            .firstAvailableSet()
+            .firstAvailableSet
             .map { selection = $0 }
     }
 }
@@ -158,7 +149,8 @@ extension SetGame {
     ) {
         claims
             .append(.init(
-                end: .now.addingTimeInterval(Constants.claimTime),
+                end: .now
+                    .addingTimeInterval(Constants.claimTime),
                 playerId: player.id
             ))
     }
@@ -169,7 +161,7 @@ extension SetGame {
         if
             let claimEnd = claims[identifiedAs: claim]?.end,
             (
-                selection.isMatch() == false
+                selection.isMatch == false
                 && claimEnd > .now
             )
             || abs(Date().timeIntervalSince(claimEnd)) < 0.01
@@ -184,7 +176,7 @@ extension SetGame {
     mutating func endPenalty(
         forClaim claim: Claim
     ) {
-        claims[identifiedAs: claim]?.penaltyEnd = nil
+        claims[identifiedAs: claim]?.penaltyEnd = .now
     }
     
     struct Constants {
@@ -195,16 +187,15 @@ extension SetGame {
 
 // MARK: - Models
 
+enum TriState: Int, CaseIterable {
+    case first
+    case second
+    case third
+}
+
 extension SetGame {
     
     struct Card: Identifiable {
-        
-        struct Content {
-            let color: Color
-            let shape: Shape
-            let shading: Shading
-            let number: Number
-        }
         
         enum Location {
             case deck
@@ -215,7 +206,7 @@ extension SetGame {
         fileprivate(set) var location = Location.deck
         fileprivate(set) var isSelected = false
         
-        let content: Content
+        let content: [TriState]
         let id = UUID()
     }
     
@@ -252,21 +243,24 @@ private extension Array {
                 }
         }
     }
+}
+
+private extension Array
+where Element == SetGame.Card {
     
-    func contains<T, U, V, W>(
+    func contains(
         _ card: Element
-    ) -> Bool
-    where Element == SetGame<T, U, V, W>.Card {
+    ) -> Bool {
         
         map(\.id)
             .contains(card.id)
     }
     
-    mutating func deal<T, U, V, W>(
+    mutating func deal(
         count: Int = 3
-    ) where Element == SetGame<T, U, V, W>.Card {
+    ) {
         
-        let cards = deck()
+        let cards = deck
             .prefix(count)
         
         cards
@@ -274,8 +268,8 @@ private extension Array {
                 self[identifiedAs: $0].location = .dealt
             }
         
-        if selected().isMatch() == true {
-            let selected = selected()
+        if selected.isMatch == true {
+            let selected = selected
             
             selected
                 .compactMap { card in
@@ -299,51 +293,51 @@ private extension Array {
         }
     }
     
-    func features<T, U, V, W>() -> [[AnyHashable]]
-    where Element == SetGame<T, U, V, W>.Card.Content {
-        [
-            map(\.color),
-            map(\.number),
-            map(\.shading),
-            map(\.shape)
-        ]
-    }
-    
-    func firstAvailableSet<T, U, V, W>() -> [Element]?
-    where Element == SetGame<T, U, V, W>.Card {
+    var firstAvailableSet: [Element]? {
         
         filter { $0.location == .dealt }
             .combinations(ofCount: 3)
-            .first { $0.isMatch() == true }
+            .first { $0.isMatch == true }
     }
 }
 
-extension Array {
+extension Array
+where Element == SetGame.Card {
     
-    func deck<T, U, V, W>() -> [Element]
-    where Element == SetGame<T, U, V, W>.Card {
+    var deck: [Element] {
         
         filter { $0.location == .deck }
     }
     
-    func selected<T, U, V, W>() -> [Element]
-    where Element == SetGame<T, U, V, W>.Card {
+    var selected: [Element] {
         
         filter(\.isSelected)
     }
     
-    func isMatch<T, U, V, W>() -> Bool?
-    where Element == SetGame<T, U, V, W>.Card {
+    var isMatch: Bool? {
         
         count == 3
             ? map(\.content)
-                .features()
+                .transposed
                 .allSatisfy(\.isSet)
             : nil
     }
 }
 
-private extension Array where Element: Hashable {
+private extension Collection
+where Iterator.Element: RandomAccessCollection {
+    
+    var transposed: [[Element.Element]] {
+        
+        first?
+            .indices
+            .map { index in map { $0[index] } }
+        ?? []
+    }
+}
+
+private extension Array
+where Element: Hashable {
     
     var isSet: Bool {
         let set = Set(self)

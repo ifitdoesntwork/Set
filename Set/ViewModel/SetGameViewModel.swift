@@ -9,55 +9,32 @@ import SwiftUI
 
 class SetGameViewModel: ObservableObject {
     
-    typealias ThemedSetGame = SetGame<
-        Theme.Color,
-        Theme.Shape,
-        Theme.Shading,
-        Theme.Number
-    >
-    
-    typealias Constants = ThemedSetGame.Constants
-    
-    private static func createGame(
-        themed theme: Theme
-    ) -> ThemedSetGame {
+    private static func createGame() -> SetGame {
         .init(
-            playersCount: 2,
-            colorCount: theme.colors.count,
-            shapeCount: theme.shapes.count,
-            shadingCount: theme.shadings.count,
-            numberCount: theme.numbers.count
-        ) {
-            .init(
-                color: theme.colors[$0],
-                shape: theme.shapes[$1],
-                shading: theme.shadings[$2],
-                number: theme.numbers[$3]
-            )
-        }
+            playersCount: 2
+        )
     }
     
-    @Published private var model = SetGameViewModel.createGame(
-        themed: .classic
-    )
+    private(set) var theme = Theme.classic
+    @Published private var model = SetGameViewModel.createGame()
     
-    var cards: [ThemedSetGame.Card] {
+    var cards: [SetGame.Card] {
         model.cards
             .filter { $0.location == .dealt }
     }
     
     var deckIsEmpty: Bool {
         model.cards
-            .deck()
+            .deck
             .isEmpty
     }
     
     var isMatch: Bool? {
         model.selection
-            .isMatch()
+            .isMatch
     }
     
-    var players: [ThemedSetGame.Player] {
+    var players: [SetGame.Player] {
         model.players
     }
     
@@ -66,8 +43,8 @@ class SetGameViewModel: ObservableObject {
     }
     
     func lastClaim(
-        by player: ThemedSetGame.Player
-    ) -> ThemedSetGame.Claim? {
+        by player: SetGame.Player
+    ) -> SetGame.Claim? {
         
         model.claims
             .last {
@@ -80,7 +57,7 @@ class SetGameViewModel: ObservableObject {
     }
     
     func claim(
-        by player: ThemedSetGame.Player
+        by player: SetGame.Player
     ) {
         model
             .claim(by: player)
@@ -88,7 +65,7 @@ class SetGameViewModel: ObservableObject {
         let claim = model.claims.last!
         
         Timer.scheduledTimer(
-            withTimeInterval: Constants.claimTime,
+            withTimeInterval: SetGame.Constants.claimTime,
             repeats: false
         ) { [weak self] _ in
             
@@ -101,12 +78,12 @@ class SetGameViewModel: ObservableObject {
     }
     
     func choose(
-        _ card: ThemedSetGame.Card
+        _ card: SetGame.Card
     ) {
         model
             .choose(card)
         
-        if model.selection.isMatch() == false {
+        if model.selection.isMatch == false {
             penalize(
                 claim: model.claims.last!
             )
@@ -119,9 +96,7 @@ class SetGameViewModel: ObservableObject {
     }
     
     func reset() {
-        model = Self.createGame(
-            themed: .classic
-        )
+        model = Self.createGame()
     }
     
     func cheat() {
@@ -130,10 +105,10 @@ class SetGameViewModel: ObservableObject {
     }
     
     private func penalize(
-        claim: ThemedSetGame.Claim
+        claim: SetGame.Claim
     ) {
         Timer.scheduledTimer(
-            withTimeInterval: Constants.penaltyTime,
+            withTimeInterval: SetGame.Constants.penaltyTime,
             repeats: false
         ) { [weak self] _ in
             
