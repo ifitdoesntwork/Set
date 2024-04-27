@@ -11,7 +11,7 @@
 		92A3AC0A2BCF895D00623609 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 92A3AC092BCF895D00623609 /* Assets.xcassets */; };
 		92A3AC0D2BCF895D00623609 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 92A3AC0C2BCF895D00623609 /* Preview Assets.xcassets */; };
 		92A3AC142BCF911B00623609 /* SetGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A3AC132BCF911B00623609 /* SetGame.swift */; };
-		92A3AC182BCF95F200623609 /* SetGameViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A3AC172BCF95F200623609 /* SetGameViewModel.swift */; };
+		92A3AC182BCF95F200623609 /* ThemedGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A3AC172BCF95F200623609 /* ThemedGame.swift */; };
 		92A3AC1A2BCFBBE000623609 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A3AC192BCFBBE000623609 /* Theme.swift */; };
 		92A3AC1C2BCFC53500623609 /* Theme+UI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A3AC1B2BCFC53500623609 /* Theme+UI.swift */; };
 		92A3AC262BD0E8D100623609 /* CardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A3AC252BD0E8D100623609 /* CardView.swift */; };
@@ -26,7 +26,7 @@
 		92A3AC092BCF895D00623609 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		92A3AC0C2BCF895D00623609 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		92A3AC132BCF911B00623609 /* SetGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetGame.swift; sourceTree = "<group>"; };
-		92A3AC172BCF95F200623609 /* SetGameViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetGameViewModel.swift; sourceTree = "<group>"; };
+		92A3AC172BCF95F200623609 /* ThemedGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemedGame.swift; sourceTree = "<group>"; };
 		92A3AC192BCFBBE000623609 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		92A3AC1B2BCFC53500623609 /* Theme+UI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Theme+UI.swift"; sourceTree = "<group>"; };
 		92A3AC252BD0E8D100623609 /* CardView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CardView.swift; sourceTree = "<group>"; };
@@ -84,7 +84,7 @@
 		92A3AC202BD0E2A800623609 /* ViewModel */ = {
 			isa = PBXGroup;
 			children = (
-				92A3AC172BCF95F200623609 /* SetGameViewModel.swift */,
+				92A3AC172BCF95F200623609 /* ThemedGame.swift */,
 				92A3AC1B2BCFC53500623609 /* Theme+UI.swift */,
 			);
 			path = ViewModel;
@@ -202,7 +202,7 @@
 				92A3AC142BCF911B00623609 /* SetGame.swift in Sources */,
 				92A3AC1A2BCFBBE000623609 /* Theme.swift in Sources */,
 				92A3AC062BCF895B00623609 /* SetApp.swift in Sources */,
-				92A3AC182BCF95F200623609 /* SetGameViewModel.swift in Sources */,
+				92A3AC182BCF95F200623609 /* ThemedGame.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

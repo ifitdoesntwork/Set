@@ -8,104 +8,146 @@
 import SwiftUI
 
 struct SetGameView: View {
-    @ObservedObject var viewModel: SetGameViewModel
+    @ObservedObject var themedGame: ThemedGame
     
     var body: some View {
         
-        panel(for: viewModel.players[0])
+        panel(for: themedGame.players[0])
             .rotationEffect(.radians(.pi))
         
+        cards
+            .padding(.horizontal)
+        
+        panel(for: themedGame.players[1])
+    }
+}
+
+private extension SetGameView {
+    
+    var cards: some View {
+        
         AspectVGrid(
-            viewModel.cards,
+            themedGame.cards,
             aspectRatio: Constants.aspectRatio,
             minWidth: Constants.minWidth
         ) { card in
             
             CardView(
                 card: card,
-                isMatch: viewModel.isMatch,
-                theme: viewModel.theme
+                isMatch: themedGame.isMatch,
+                theme: themedGame.theme
             )
             .padding(Constants.cardPadding)
             .onTapGesture {
-                viewModel
+                themedGame
                     .choose(card)
             }
         }
-        .padding(.horizontal)
-        
-        panel(for: viewModel.players[1])
     }
     
-    private func panel(
+    // MARK: - Panel
+    
+    func panel(
         for player: SetGame.Player
     ) -> some View {
         
         HStack {
-            
             commonControls(for: player)
             
             Spacer()
             
-            let claim = viewModel.lastClaim(by: player)
-            
-            if let claim {
-                Text(
-                    (claim.penaltyEnd ?? claim.end) + 0.5,
-                    style: .timer
+            if 
+                let timerEnd = themedGame
+                    .timerEnd(for: player)
+            {
+                timer(
+                    for: player,
+                    timerEnd: timerEnd
                 )
-                .foregroundStyle(
-                    claim.penaltyEnd == nil ? .green : .red
-                )
-                .font(.title)
-                .monospacedDigit()
             }
             
-            Button {
-                viewModel
-                    .claim(by: player)
-            } label: {
-                Image(
-                    systemName: "exclamationmark.circle.fill"
-                )
-                .font(.largeTitle)
-            }
-            .disabled(
-                !viewModel.canClaim
-                || claim?.penaltyEnd != nil
-            )
+            claim(for: player)
         }
         .padding(.horizontal)
     }
     
-    @ViewBuilder
-    private func commonControls(
+    func timer(
+        for player: SetGame.Player,
+        timerEnd: Date
+    ) -> some View {
+        
+        Text(timerEnd + 0.5, style: .timer)
+            .foregroundStyle(
+                themedGame.hasPenalty(for: player)
+                    ? .red : .green
+            )
+            .font(.title)
+            .monospacedDigit()
+    }
+    
+    func claim(
         for player: SetGame.Player
     ) -> some View {
         
         Button {
-            viewModel.deal()
+            themedGame
+                .claim(by: player)
+        } label: {
+            Image(
+                systemName: "exclamationmark.circle.fill"
+            )
+            .font(.largeTitle)
+        }
+        .disabled(
+            !themedGame.canClaim
+            || themedGame.hasPenalty(for: player)
+        )
+    }
+    
+    // MARK: - Common Controls
+    
+    @ViewBuilder
+    func commonControls(
+        for player: SetGame.Player
+    ) -> some View {
+        
+        deal
+        reset
+        score(for: player)
+    }
+    
+    var deal: some View {
+        Button {
+            themedGame.deal()
         } label: {
             Image(
                 systemName: "rectangle.stack.fill.badge.plus"
             )
             .font(.largeTitle)
         }
-        .disabled(viewModel.deckIsEmpty)
-        
+        .disabled(themedGame.deckIsEmpty)
+    }
+    
+    var reset: some View {
         Button {
-            viewModel.reset()
+            themedGame.reset()
         } label: {
             Image(
                 systemName: "arrow.counterclockwise.circle.fill"
             )
             .font(.largeTitle)
         }
+    }
+    
+    @ViewBuilder
+    func score(
+        for player: SetGame.Player
+    ) -> some View {
         
-        let isMatch = viewModel.isMatch == true
+        let isMatch = themedGame.isMatch == true
         
         Button {
-            viewModel.cheat()
+            themedGame.cheat()
         } label: {
             Text("Score: \(player.score)")
                 .font(.title)
@@ -114,7 +156,7 @@ struct SetGameView: View {
         .disabled(isMatch)
     }
     
-    private struct Constants {
+    struct Constants {
         static let aspectRatio: CGFloat = 2/3
         static let minWidth: CGFloat = 72
         static let cardPadding: CGFloat = 4
@@ -122,5 +164,5 @@ struct SetGameView: View {
 }
 
 #Preview {
-    SetGameView(viewModel: .init())
+    SetGameView(themedGame: .init())
 }

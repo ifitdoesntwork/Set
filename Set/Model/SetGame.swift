@@ -180,8 +180,8 @@ extension SetGame {
     }
     
     struct Constants {
-        static var claimTime: TimeInterval { 5 }
-        static var penaltyTime: TimeInterval { 10 }
+        static let claimTime: TimeInterval = 5
+        static let penaltyTime: TimeInterval = 10
     }
 }
 
@@ -199,8 +199,8 @@ extension SetGame {
         
         enum Location {
             case deck
-            case dealt
-            case matched
+            case field
+            case pile
         }
         
         fileprivate(set) var location = Location.deck
@@ -212,7 +212,7 @@ extension SetGame {
     
     struct Player: Identifiable {
         var score = 0
-        var setFindingStart = Date()
+        fileprivate var setFindingStart = Date()
         let id = UUID()
     }
     
@@ -265,7 +265,7 @@ where Element == SetGame.Card {
         
         cards
             .forEach {
-                self[identifiedAs: $0].location = .dealt
+                self[identifiedAs: $0].location = .field
             }
         
         if selected.isMatch == true {
@@ -276,12 +276,12 @@ where Element == SetGame.Card {
                     firstIndex { $0.id == card.id }
                 }
                 .forEach { selectedIndex in
-                    self[selectedIndex].location = .matched
+                    self[selectedIndex].location = .pile
                     self[selectedIndex].isSelected = false
                     
                     if cards.count == selected.count {
                         
-                        lastIndex { $0.location == .dealt }
+                        lastIndex { $0.location == .field }
                             .map { lastDealtIndex in
                                 swapAt(
                                     selectedIndex,
@@ -295,7 +295,7 @@ where Element == SetGame.Card {
     
     var firstAvailableSet: [Element]? {
         
-        filter { $0.location == .dealt }
+        field
             .combinations(ofCount: 3)
             .first { $0.isMatch == true }
     }
@@ -307,6 +307,11 @@ where Element == SetGame.Card {
     var deck: [Element] {
         
         filter { $0.location == .deck }
+    }
+    
+    var field: [Element] {
+        
+        filter { $0.location == .field }
     }
     
     var selected: [Element] {

@@ -14,39 +14,27 @@ struct CardView: View {
     let theme: Theme
     
     var body: some View {
+        
         GeometryReader { geometry in
+            
             let aspectRatio = geometry.size.width
             / geometry.size.height
             
             ZStack {
                 base
                 
-                VStack {
-                    ForEach(
-                        1...card.number(from: theme).rawValue,
-                        id: \.self
-                    ) { _ in
-                        card.shape(from: theme)
-                            .ui(shading: card
-                                .shading(from: theme)
-                            )
-                            .padding(Constants.padding)
-                            .aspectRatio(
-                                aspectRatio * 3,
-                                contentMode: .fit
-                            )
-                            .foregroundStyle(
-                                card.color(from: theme).ui
-                            )
-                    }
-                }
-                .padding(Constants.padding)
+                features(aspectRatio: aspectRatio)
+                    .padding(Constants.padding)
             }
         }
     }
+}
+
+private extension CardView {
     
     @ViewBuilder
-    private var base: some View {
+    var base: some View {
+        
         let base = RoundedRectangle(
             cornerRadius: Constants.cornerRadius
         )
@@ -55,7 +43,7 @@ struct CardView: View {
             .foregroundStyle(
                 card
                     .backgroundColor(isMatch: isMatch)
-                    .opacity(0.3)
+                    .opacity(Constants.backgroundOpacity)
             )
         
         base
@@ -65,21 +53,50 @@ struct CardView: View {
             .foregroundStyle(.gray)
     }
     
-    private struct Constants {
+    func features(
+        aspectRatio: CGFloat
+    ) -> some View {
+        
+        VStack {
+            ForEach(
+                1...card.number(from: theme).rawValue,
+                id: \.self
+            ) { _ in
+                
+                card
+                    .shape(from: theme)
+                    .ui(shading: card.shading(from: theme))
+                    .padding(Constants.padding)
+                    .aspectRatio(
+                        aspectRatio * 3,
+                        contentMode: .fit
+                    )
+                    .foregroundStyle(
+                        card.color(from: theme).ui
+                    )
+            }
+        }
+    }
+    
+    struct Constants {
         static let cornerRadius: CGFloat = 12
+        static let backgroundOpacity: CGFloat = 0.3
         static let lineWidth: CGFloat = 2
         static let padding: CGFloat = 5
     }
 }
 
 #Preview {
+    
     VStack {
-        
-        ForEach(0..<3, id: \.self) {
+        ForEach(
+            TriState.allCases,
+            id: \.self
+        ) {
             CardView(
                 card: .init(
                     content: .init(
-                        repeating: .allCases[$0],
+                        repeating: $0,
                         count: 4
                     )
                 ),
