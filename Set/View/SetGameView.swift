@@ -144,7 +144,8 @@ private extension SetGameView {
         for player: SetGame.Player
     ) -> some View {
         
-        let isMatch = themedGame.isMatch == true
+        let isDisabled = themedGame.isMatch == true
+        || themedGame.isOver
         
         Button {
             themedGame.cheat()
@@ -152,8 +153,8 @@ private extension SetGameView {
             Text("Score: \(player.score)")
                 .font(.title)
         }
-        .foregroundStyle(isMatch ? .black : .blue)
-        .disabled(isMatch)
+        .foregroundStyle(isDisabled ? .black : .blue)
+        .disabled(isDisabled)
     }
     
     struct Constants {

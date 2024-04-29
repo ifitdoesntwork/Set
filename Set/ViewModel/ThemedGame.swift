@@ -19,6 +19,10 @@ class ThemedGame: ObservableObject {
         game.cards.deck.isEmpty
     }
     
+    var isOver: Bool {
+        game.isOver
+    }
+    
     var isMatch: Bool? {
         game.selection.isMatch
     }
@@ -29,6 +33,7 @@ class ThemedGame: ObservableObject {
     
     var canClaim: Bool {
         game.activeClaim == nil
+        && !isOver
     }
     
     func timerEnd(

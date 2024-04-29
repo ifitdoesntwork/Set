@@ -49,8 +49,10 @@ struct SetGame {
         }
         set {
             if selection.isMatch == true {
-                cards
-                    .deal()
+                selection
+                    .forEach {
+                        cards[identifiedAs: $0].location = .pile
+                    }
             }
             
             cards
@@ -64,6 +66,12 @@ struct SetGame {
     var activeClaim: Claim? {
         claims
             .first { $0.end > .now }
+    }
+    
+    var isOver: Bool {
+        cards.deck.isEmpty
+        && selection.isMatch == true
+        && selection.count == cards.field.count
     }
     
     mutating func choose(
@@ -259,38 +267,11 @@ where Element == SetGame.Card {
     mutating func deal(
         count: Int = 3
     ) {
-        
-        let cards = deck
+        deck
             .prefix(count)
-        
-        cards
             .forEach {
                 self[identifiedAs: $0].location = .field
             }
-        
-        if selected.isMatch == true {
-            let selected = selected
-            
-            selected
-                .compactMap { card in
-                    firstIndex { $0.id == card.id }
-                }
-                .forEach { selectedIndex in
-                    self[selectedIndex].location = .pile
-                    self[selectedIndex].isSelected = false
-                    
-                    if cards.count == selected.count {
-                        
-                        lastIndex { $0.location == .field }
-                            .map { lastDealtIndex in
-                                swapAt(
-                                    selectedIndex,
-                                    lastDealtIndex
-                                )
-                            }
-                    }
-                }
-        }
     }
     
     var firstAvailableSet: [Element]? {
