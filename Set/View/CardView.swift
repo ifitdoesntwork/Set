@@ -11,6 +11,7 @@ import SwiftUI
 struct CardView: View {
     let card: SetGame.Card
     let isMatch: Bool?
+    let isFaceUp: Bool
     let theme: Theme
     
     var body: some View {
@@ -21,23 +22,30 @@ struct CardView: View {
             / geometry.size.height
             
             ZStack {
-                base
-                
-                features(aspectRatio: aspectRatio)
-                    .padding(Constants.padding)
+                if isFaceUp {
+                    base
+                } else {
+                    background
+                    
+                    features(aspectRatio: aspectRatio)
+                        .padding(Constants.padding)
+                }
             }
+            .foregroundStyle(.gray)
         }
     }
 }
 
 private extension CardView {
     
-    @ViewBuilder
-    var base: some View {
+    var base: some InsettableShape {
         
-        let base = RoundedRectangle(
+        RoundedRectangle(
             cornerRadius: Constants.cornerRadius
         )
+    }
+    
+    var background: some View {
         
         base
             .foregroundStyle(
@@ -45,12 +53,12 @@ private extension CardView {
                     .backgroundColor(isMatch: isMatch)
                     .opacity(Constants.backgroundOpacity)
             )
-        
-        base
-            .strokeBorder(
-                lineWidth: Constants.lineWidth
-            )
-            .foregroundStyle(.gray)
+            .overlay(
+                base
+                    .strokeBorder(
+                        lineWidth: Constants.lineWidth
+                    )
+        )
     }
     
     func features(
@@ -101,6 +109,7 @@ private extension CardView {
                     )
                 ),
                 isMatch: nil,
+                isFaceUp: $0.rawValue % 2 == 1,
                 theme: .classic
             )
         }

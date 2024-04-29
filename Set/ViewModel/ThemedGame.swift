@@ -12,11 +12,7 @@ class ThemedGame: ObservableObject {
     @Published private var game = ThemedGame.createGame()
     
     var cards: [SetGame.Card] {
-        game.cards.field
-    }
-    
-    var deckIsEmpty: Bool {
-        game.cards.deck.isEmpty
+        game.cards
     }
     
     var isOver: Bool {
@@ -133,5 +129,12 @@ private extension ThemedGame {
             self?.game
                 .endPenalty(forClaim: claim)
         }
+    }
+}
+
+extension SetGame.Card {
+    
+    var isFaceUp: Bool {
+        location == .deck
     }
 }

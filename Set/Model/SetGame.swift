@@ -16,16 +16,16 @@ struct SetGame {
     init(
         playersCount: Int
     ) {
-        players = (0..<playersCount)
-            .map { _ in .init() }
+        let triStateCases = TriState
+            .allCases
         
         cards = product(
-            TriState.allCases,
+            triStateCases,
             product(
-                TriState.allCases,
+                triStateCases,
                 product(
-                    TriState.allCases,
-                    TriState.allCases
+                    triStateCases,
+                    triStateCases
                 )
             )
         )
@@ -41,6 +41,9 @@ struct SetGame {
         
         cards
             .deal(count: 12)
+        
+        players = (0..<playersCount)
+            .map { _ in .init() }
     }
     
     private(set) var selection: [Card] {
@@ -70,8 +73,8 @@ struct SetGame {
     
     var isOver: Bool {
         cards.deck.isEmpty
-        && selection.isMatch == true
         && selection.count == cards.field.count
+        && selection.isMatch == true
     }
     
     mutating func choose(

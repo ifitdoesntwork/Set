@@ -27,14 +27,15 @@ private extension SetGameView {
     var cards: some View {
         
         AspectVGrid(
-            themedGame.cards,
+            themedGame.cards.field,
             aspectRatio: Constants.aspectRatio,
             minWidth: Constants.minWidth
         ) { card in
             
             CardView(
                 card: card,
-                isMatch: themedGame.isMatch,
+                isMatch: themedGame.isMatch, 
+                isFaceUp: card.isFaceUp,
                 theme: themedGame.theme
             )
             .padding(Constants.cardPadding)
@@ -111,21 +112,33 @@ private extension SetGameView {
         for player: SetGame.Player
     ) -> some View {
         
-        deal
+        if player.id == themedGame.players[0].id {
+            
+        } else {
+            deck
+        }
+        
         reset
         score(for: player)
     }
     
-    var deal: some View {
-        Button {
-            themedGame.deal()
-        } label: {
-            Image(
-                systemName: "rectangle.stack.fill.badge.plus"
-            )
-            .font(.largeTitle)
+    var deck: some View {
+       
+        ZStack {
+            ForEach(themedGame.cards.deck) { card in
+                CardView(
+                    card: card,
+                    isMatch: nil,
+                    isFaceUp: card.isFaceUp,
+                    theme: themedGame.theme
+                )
+                .frame(
+                    width: Constants.deckWidth,
+                    height: Constants.deckWidth
+                    / Constants.aspectRatio
+                )
+            }
         }
-        .disabled(themedGame.deckIsEmpty)
     }
     
     var reset: some View {
@@ -160,6 +173,7 @@ private extension SetGameView {
     struct Constants {
         static let aspectRatio: CGFloat = 2/3
         static let minWidth: CGFloat = 72
+        static let deckWidth: CGFloat = 48
         static let cardPadding: CGFloat = 4
     }
 }
