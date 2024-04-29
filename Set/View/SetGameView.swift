@@ -46,30 +46,88 @@ private extension SetGameView {
         }
     }
     
-    // MARK: - Panel
-    
     func panel(
         for player: SetGame.Player
     ) -> some View {
         
-        HStack {
-            commonControls(for: player)
+        ZStack {
+            stack(for: player)
             
-            Spacer()
-            
-            if 
-                let timerEnd = themedGame
-                    .timerEnd(for: player)
-            {
-                timer(
-                    for: player,
-                    timerEnd: timerEnd
-                )
+            HStack {
+                score(for: player)
+                
+                Spacer()
+                
+                if 
+                    let timerEnd = themedGame
+                        .timerEnd(for: player)
+                {
+                    timer(
+                        for: player,
+                        timerEnd: timerEnd
+                    )
+                }
+                
+                claim(for: player)
             }
-            
-            claim(for: player)
+            .padding(.horizontal)
         }
-        .padding(.horizontal)
+    }
+    
+    @ViewBuilder
+    func stack(
+        for player: SetGame.Player
+    ) -> some View {
+        
+        stack(
+            of: player.id == themedGame.players[0].id
+                ? themedGame.cards.pile
+                : themedGame.cards.deck
+        )
+        .frame(
+            width: Constants.minWidth,
+            height: Constants.minWidth
+            / Constants.aspectRatio
+        )
+    }
+    
+    @ViewBuilder
+    func stack(
+        of cards: [SetGame.Card]
+    ) -> some View {
+       
+        if cards.isEmpty {
+            Color.clear
+        } else {
+            ZStack {
+                ForEach(cards) { card in
+                    CardView(
+                        card: card,
+                        isMatch: nil,
+                        isFaceUp: card.isFaceUp,
+                        theme: themedGame.theme
+                    )
+                }
+            }
+        }
+    }
+    
+    @ViewBuilder
+    func score(
+        for player: SetGame.Player
+    ) -> some View {
+        
+        let isDisabled = themedGame.isMatch == true
+        || themedGame.isOver
+        
+        Button {
+            themedGame.cheat()
+        } label: {
+            Text("Score: \(player.score)")
+                .font(.title)
+        }
+        .foregroundStyle(isDisabled ? .black : .blue)
+        .disabled(isDisabled)
     }
     
     func timer(
@@ -103,71 +161,6 @@ private extension SetGameView {
             !themedGame.canClaim
             || themedGame.hasPenalty(for: player)
         )
-    }
-    
-    // MARK: - Common Controls
-    
-    @ViewBuilder
-    func commonControls(
-        for player: SetGame.Player
-    ) -> some View {
-        
-        if player.id == themedGame.players[0].id {
-            
-        } else {
-            deck
-        }
-        
-        reset
-        score(for: player)
-    }
-    
-    var deck: some View {
-       
-        ZStack {
-            ForEach(themedGame.cards.deck) { card in
-                CardView(
-                    card: card,
-                    isMatch: nil,
-                    isFaceUp: card.isFaceUp,
-                    theme: themedGame.theme
-                )
-                .frame(
-                    width: Constants.deckWidth,
-                    height: Constants.deckWidth
-                    / Constants.aspectRatio
-                )
-            }
-        }
-    }
-    
-    var reset: some View {
-        Button {
-            themedGame.reset()
-        } label: {
-            Image(
-                systemName: "arrow.counterclockwise.circle.fill"
-            )
-            .font(.largeTitle)
-        }
-    }
-    
-    @ViewBuilder
-    func score(
-        for player: SetGame.Player
-    ) -> some View {
-        
-        let isDisabled = themedGame.isMatch == true
-        || themedGame.isOver
-        
-        Button {
-            themedGame.cheat()
-        } label: {
-            Text("Score: \(player.score)")
-                .font(.title)
-        }
-        .foregroundStyle(isDisabled ? .black : .blue)
-        .disabled(isDisabled)
     }
     
     struct Constants {

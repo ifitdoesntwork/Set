@@ -48,10 +48,14 @@ private extension CardView {
     var background: some View {
         
         base
-            .foregroundStyle(
-                card
-                    .backgroundColor(isMatch: isMatch)
-                    .opacity(Constants.backgroundOpacity)
+            .foregroundStyle(.background)
+            .overlay(
+                base
+                    .foregroundStyle(
+                        card
+                            .backgroundColor(isMatch: isMatch)
+                            .opacity(Constants.backgroundOpacity)
+                    )
             )
             .overlay(
                 base
