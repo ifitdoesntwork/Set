@@ -22,7 +22,7 @@ struct SetGameView: View {
         panel(for: themedGame.players[1])
     }
     
-    @Namespace private var discarding
+    @Namespace private var dealing
 }
 
 private extension SetGameView {
@@ -55,12 +55,8 @@ private extension SetGameView {
             )
             .matchedGeometryEffect(
                 id: card.id,
-                in: discarding
+                in: dealing
             )
-            .transition(.asymmetric(
-                insertion: .identity,
-                removal: .identity
-            ))
             .padding(Constants.cardPadding)
             .onTapGesture {
                 
@@ -131,9 +127,13 @@ private extension SetGameView {
             / Constants.aspectRatio
         )
         .onTapGesture {
-            isFirstPlayer
-                ? themedGame.reset()
-                : themedGame.deal()
+            withAnimation {
+                if isFirstPlayer {
+                    themedGame.reset()
+                } else {
+                    themedGame.deal()
+                }
+            }
         }
     }
     
@@ -156,12 +156,8 @@ private extension SetGameView {
                     )
                     .matchedGeometryEffect(
                         id: card.id,
-                        in: discarding
+                        in: dealing
                     )
-                    .transition(.asymmetric(
-                        insertion: .identity,
-                        removal: .identity
-                    ))
                 }
             }
         }
