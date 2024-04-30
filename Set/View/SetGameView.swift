@@ -64,14 +64,11 @@ private extension SetGameView {
             .padding(Constants.cardPadding)
             .onTapGesture {
                 
-                let oldPileIds = themedGame.cards.pile
-                    .map(\.id)
-                
                 themedGame
                     .choose(card)
                 
                 themedGame.cards.pile
-                    .filter { !oldPileIds.contains($0.id) }
+                    .filter { !pileIds.contains($0.id) }
                     .forEach { card in
                         withAnimation {
                             pileIds.append(card.id)
@@ -121,8 +118,10 @@ private extension SetGameView {
         for player: SetGame.Player
     ) -> some View {
         
-        stack(
-            of: player.id == themedGame.players[0].id
+        let isFirstPlayer = player.id == themedGame.players[0].id
+        
+        return stack(
+            of: isFirstPlayer
                 ? pile
                 : themedGame.cards.deck
         )
@@ -131,6 +130,11 @@ private extension SetGameView {
             height: Constants.minWidth
             / Constants.aspectRatio
         )
+        .onTapGesture {
+            isFirstPlayer
+                ? themedGame.reset()
+                : themedGame.deal()
+        }
     }
     
     @ViewBuilder
@@ -139,7 +143,8 @@ private extension SetGameView {
     ) -> some View {
        
         if cards.isEmpty {
-            Color.clear
+            Rectangle()
+                .foregroundStyle(.background)
         } else {
             ZStack {
                 ForEach(cards) { card in
