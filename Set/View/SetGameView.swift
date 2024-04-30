@@ -9,6 +9,7 @@ import SwiftUI
 
 struct SetGameView: View {
     @ObservedObject var themedGame: ThemedGame
+    @State private var pileIds = [SetGame.Card.ID]()
     
     var body: some View {
         
@@ -20,28 +21,62 @@ struct SetGameView: View {
         
         panel(for: themedGame.players[1])
     }
+    
+    @Namespace private var discarding
 }
 
 private extension SetGameView {
     
+    var field: [SetGame.Card] {
+        themedGame.cards
+            .filter {
+                !(
+                    pileIds.contains($0.id)
+                    || themedGame.cards.deck
+                        .map(\.id)
+                        .contains($0.id)
+                )
+            }
+    }
+    
     var cards: some View {
         
         AspectVGrid(
-            themedGame.cards.field,
+            field,
             aspectRatio: Constants.aspectRatio,
             minWidth: Constants.minWidth
         ) { card in
             
             CardView(
                 card: card,
-                isMatch: themedGame.isMatch, 
+                isMatch: themedGame.isMatch,
                 isFaceUp: card.isFaceUp,
                 theme: themedGame.theme
             )
+            .matchedGeometryEffect(
+                id: card.id,
+                in: discarding
+            )
+            .transition(.asymmetric(
+                insertion: .identity,
+                removal: .identity
+            ))
             .padding(Constants.cardPadding)
             .onTapGesture {
+                
+                let oldPileIds = themedGame.cards.pile
+                    .map(\.id)
+                
                 themedGame
                     .choose(card)
+                
+                themedGame.cards.pile
+                    .filter { !oldPileIds.contains($0.id) }
+                    .forEach { card in
+                        withAnimation {
+                            pileIds.append(card.id)
+                        }
+                    }
             }
         }
     }
@@ -74,14 +109,21 @@ private extension SetGameView {
         }
     }
     
-    @ViewBuilder
+    var pile: [SetGame.Card] {
+        pileIds
+            .compactMap { id in
+                themedGame.cards
+                    .first { $0.id == id }
+            }
+    }
+    
     func stack(
         for player: SetGame.Player
     ) -> some View {
         
         stack(
             of: player.id == themedGame.players[0].id
-                ? themedGame.cards.pile
+                ? pile
                 : themedGame.cards.deck
         )
         .frame(
@@ -107,6 +149,14 @@ private extension SetGameView {
                         isFaceUp: card.isFaceUp,
                         theme: themedGame.theme
                     )
+                    .matchedGeometryEffect(
+                        id: card.id,
+                        in: discarding
+                    )
+                    .transition(.asymmetric(
+                        insertion: .identity,
+                        removal: .identity
+                    ))
                 }
             }
         }

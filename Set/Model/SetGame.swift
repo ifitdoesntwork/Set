@@ -55,7 +55,6 @@ struct SetGame {
                 selection
                     .forEach {
                         cards[identifiedAs: $0].location = .pile
-                        cards.moveToBack($0)
                     }
             }
             
@@ -283,18 +282,6 @@ where Element == SetGame.Card {
         field
             .combinations(ofCount: 3)
             .first { $0.isMatch == true }
-    }
-    
-    mutating func moveToBack(
-        _ card: Element
-    ) {
-        firstIndex { $0.id == card.id }
-            .map { cardIndex in
-                firstIndex { $0.id == last?.id }
-                    .map {
-                        swapAt($0, cardIndex)
-                    }
-            }
     }
 }
 
