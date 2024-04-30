@@ -39,6 +39,17 @@ private extension SetGameView {
             }
     }
     
+    func updatePile() {
+        
+        themedGame.cards.pile
+            .filter { !pileIds.contains($0.id) }
+            .forEach { card in
+                withAnimation {
+                    pileIds.append(card.id)
+                }
+            }
+    }
+    
     var cards: some View {
         
         AspectVGrid(
@@ -59,17 +70,8 @@ private extension SetGameView {
             )
             .padding(Constants.cardPadding)
             .onTapGesture {
-                
-                themedGame
-                    .choose(card)
-                
-                themedGame.cards.pile
-                    .filter { !pileIds.contains($0.id) }
-                    .forEach { card in
-                        withAnimation {
-                            pileIds.append(card.id)
-                        }
-                    }
+                themedGame.choose(card)
+                updatePile()
             }
         }
     }
@@ -132,6 +134,7 @@ private extension SetGameView {
                     themedGame.reset()
                 } else {
                     themedGame.deal()
+                    updatePile()
                 }
             }
         }
