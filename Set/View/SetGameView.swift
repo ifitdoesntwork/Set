@@ -224,12 +224,14 @@ private extension SetGameView {
                 }
             : []
         
-        if isDealing {
-            withAnimation {
+        withAnimation {
+            if isDealing {
                 themedGame.deal()
+            } else {
+                themedGame.reset()
+                fieldIds.removeAll()
+                pileIds.removeAll()
             }
-        } else {
-            themedGame.reset()
         }
         
         updateUI(

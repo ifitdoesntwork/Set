@@ -218,7 +218,13 @@ extension SetGame {
         fileprivate(set) var isSelected = false
         
         let content: [TriState]
-        let id = UUID()
+        
+        var id: String {
+            content
+                .map(\.rawValue)
+                .map(String.init)
+                .joined()
+        }
     }
     
     struct Player: Identifiable {
