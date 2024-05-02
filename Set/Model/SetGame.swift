@@ -270,35 +270,17 @@ where Element == SetGame.Card {
     mutating func deal(
         count: Int = 3
     ) {
-        let cards = deck
+        deck
             .prefix(count)
-        
-        cards
             .forEach {
                 self[identifiedAs: $0].location = .field
             }
         
         if selected.isMatch == true {
-            let selected = selected
-            
             selected
-                .compactMap { card in
-                    firstIndex { $0.id == card.id }
-                }
-                .forEach { selectedIndex in
-                    self[selectedIndex].location = .pile
-                    self[selectedIndex].isSelected = false
-                    
-                    if cards.count == selected.count {
-                        
-                        lastIndex { $0.location == .field }
-                            .map { lastDealtIndex in
-                                swapAt(
-                                    selectedIndex,
-                                    lastDealtIndex
-                                )
-                            }
-                    }
+                .forEach {
+                    self[identifiedAs: $0].location = .pile
+                    self[identifiedAs: $0].isSelected = false
                 }
         }
     }

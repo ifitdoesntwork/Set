@@ -9,17 +9,20 @@ import SwiftUI
 
 struct AspectVGrid<Item: Identifiable, ItemView: View>: View {
     private let items: [Item]
+    private let count: Int
     private let aspectRatio: CGFloat
     private let minWidth: CGFloat
     private let content: (Item) -> ItemView
     
     init(
         _ items: [Item],
+        count: Int,
         aspectRatio: CGFloat = 1,
         minWidth: CGFloat = .zero,
         @ViewBuilder content: @escaping (Item) -> ItemView
     ) {
         self.items = items
+        self.count = count
         self.aspectRatio = aspectRatio
         self.minWidth = minWidth
         self.content = content
@@ -31,7 +34,7 @@ struct AspectVGrid<Item: Identifiable, ItemView: View>: View {
             
             let gridItemSize = max(
                 gridItemWidthThatFits(
-                    count: items.count,
+                    count: max(count, items.count),
                     size: geometry.size,
                     atAspectRatio: aspectRatio
                 ),

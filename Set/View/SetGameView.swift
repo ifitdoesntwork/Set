@@ -9,6 +9,7 @@ import SwiftUI
 
 struct SetGameView: View {
     @ObservedObject var themedGame: ThemedGame
+    @State private var fieldIds = [SetGame.Card.ID]()
     @State private var pileIds = [SetGame.Card.ID]()
     
     var body: some View {
@@ -20,6 +21,9 @@ struct SetGameView: View {
             .padding(.horizontal)
         
         panel(for: themedGame.players[1])
+            .onAppear {
+                updateUI()
+            }
     }
     
     @Namespace private var dealing
@@ -27,33 +31,11 @@ struct SetGameView: View {
 
 private extension SetGameView {
     
-    var field: [SetGame.Card] {
-        themedGame.cards
-            .filter {
-                !(
-                    pileIds.contains($0.id)
-                    || themedGame.cards.deck
-                        .map(\.id)
-                        .contains($0.id)
-                )
-            }
-    }
-    
-    func updatePile() {
-        
-        themedGame.cards.pile
-            .filter { !pileIds.contains($0.id) }
-            .forEach { card in
-                withAnimation {
-                    pileIds.append(card.id)
-                }
-            }
-    }
-    
     var cards: some View {
         
         AspectVGrid(
-            field,
+            cards(from: fieldIds), 
+            count: themedGame.cards.field.count,
             aspectRatio: Constants.aspectRatio,
             minWidth: Constants.minWidth
         ) { card in
@@ -70,8 +52,11 @@ private extension SetGameView {
             )
             .padding(Constants.cardPadding)
             .onTapGesture {
-                themedGame.choose(card)
-                updatePile()
+                withAnimation {
+                    themedGame.choose(card)
+                }
+                
+                updateUI()
             }
         }
     }
@@ -104,14 +89,6 @@ private extension SetGameView {
         }
     }
     
-    var pile: [SetGame.Card] {
-        pileIds
-            .compactMap { id in
-                themedGame.cards
-                    .first { $0.id == id }
-            }
-    }
-    
     func stack(
         for player: SetGame.Player
     ) -> some View {
@@ -120,23 +97,16 @@ private extension SetGameView {
         
         return stack(
             of: isFirstPlayer
-                ? pile
-                : themedGame.cards.deck
+                ? cards(from: pileIds)
+                : themedGame.cards.deck + themedGame.cards.field
+                    .filter { !fieldIds.contains($0.id) }
         )
         .frame(
             width: Constants.minWidth,
-            height: Constants.minWidth
-            / Constants.aspectRatio
+            height: Constants.minWidth / Constants.aspectRatio
         )
         .onTapGesture {
-            withAnimation {
-                if isFirstPlayer {
-                    themedGame.reset()
-                } else {
-                    themedGame.deal()
-                    updatePile()
-                }
-            }
+            handleStackTap(isDealing: !isFirstPlayer)
         }
     }
     
@@ -171,11 +141,12 @@ private extension SetGameView {
         for player: SetGame.Player
     ) -> some View {
         
-        let isDisabled = themedGame.isMatch == true
-        || themedGame.isOver
+        let isDisabled = isMatch || themedGame.isOver
         
         Button {
-            themedGame.cheat()
+            withAnimation {
+                themedGame.cheat()
+            }
         } label: {
             Text("Score: \(player.score)")
                 .font(.title)
@@ -222,6 +193,102 @@ private extension SetGameView {
         static let minWidth: CGFloat = 72
         static let deckWidth: CGFloat = 48
         static let cardPadding: CGFloat = 4
+    }
+}
+
+private extension SetGameView {
+    
+    var isMatch: Bool {
+        themedGame.isMatch == true
+    }
+    
+    func cards(
+        from ids: [SetGame.Card.ID]
+    ) -> [SetGame.Card] {
+        
+        ids
+            .compactMap { id in
+                themedGame.cards
+                    .first { $0.id == id }
+            }
+    }
+    
+    func handleStackTap(
+        isDealing: Bool
+    ) {
+        let matchIndices = isDealing && isMatch
+            ? themedGame.cards.selected
+                .compactMap { card in
+                    fieldIds
+                        .firstIndex { $0 == card.id }
+                }
+            : []
+        
+        if isDealing {
+            withAnimation {
+                themedGame.deal()
+            }
+        } else {
+            themedGame.reset()
+        }
+        
+        updateUI(
+            insertionIndices: matchIndices
+        )
+    }
+    
+    func updateUI(
+        insertionIndices: [Int] = []
+    ) {
+        let indices = insertionIndices
+            .sorted()
+        
+        pileIds.update(
+            from: themedGame.cards.pile
+        ) {
+            fieldIds.remove($1)
+            pileIds.append($1)
+        }
+        
+        fieldIds.update(
+            from: themedGame.cards.field
+        ) {
+            fieldIds.insert(
+                $1,
+                at: $0 < indices.count
+                    ? indices[$0]
+                    : fieldIds.count
+            )
+        }
+    }
+}
+
+private extension Array where Element: Equatable {
+    
+    mutating func remove(_ element: Element) {
+        
+        firstIndex { $0 == element }
+            .map { _ = remove(at: $0) }
+    }
+}
+
+private extension Array where Element == SetGame.Card.ID {
+    
+    func update(
+        from cards: [SetGame.Card],
+        using closure: (Int, Element) -> Void
+    ) {
+        cards
+            .filter { !contains($0.id) }
+            .indexed()
+            .forEach { index, card in
+                withAnimation(
+                    .easeInOut(duration: 0.8)
+                    .delay(TimeInterval(index) * 0.1)
+                ) {
+                    closure(index, card.id)
+                }
+            }
     }
 }
 
