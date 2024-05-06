@@ -33,7 +33,7 @@ class ThemedGame: ObservableObject {
     }
     
     func card(
-        _ card: SetGame.Card,
+        presenting card: SetGame.Card,
         isFaceUp: Bool
     ) -> ThemedCard {
         

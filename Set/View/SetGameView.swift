@@ -8,10 +8,32 @@
 import SwiftUI
 
 struct SetGameView: View {
+    
+    private struct Position {
+        let offset: CGSize
+        let angle: Double
+        
+        init() {
+            offset = .init(
+                width: .randomPosition,
+                height: .randomPosition
+            )
+            
+            angle = .randomPosition
+        }
+    }
+    
     @ObservedObject var themedGame: ThemedGame
-    @State private var fieldIds = [SetGame.Card.ID]()
-    @State private var pileIds = [SetGame.Card.ID]()
-    @State private var faceUpIds = [SetGame.Card.ID]()
+    
+    typealias Card = SetGame.Card
+    typealias CardID = Card.ID
+    
+    @State private var fieldIds = [CardID]()
+    @State private var pileIds = [CardID]()
+    @State private var faceUpIds = [CardID]()
+    @State private var positions = [CardID: Position]()
+    
+    @Namespace private var dealing
     
     var body: some View {
         
@@ -32,8 +54,6 @@ struct SetGameView: View {
                 updateUI()
             }
     }
-    
-    @Namespace private var dealing
 }
 
 private extension SetGameView {
@@ -47,7 +67,7 @@ private extension SetGameView {
             minWidth: Constants.minWidth
         ) { card in
             
-            CardView(card: themedCard(card))
+            CardView(card: presentation(of: card))
                 .matchedGeometryEffect(
                     id: card.id,
                     in: dealing
@@ -114,7 +134,7 @@ private extension SetGameView {
     
     @ViewBuilder
     func stack(
-        of cards: [SetGame.Card]
+        of cards: [Card]
     ) -> some View {
        
         if cards.isEmpty {
@@ -123,11 +143,19 @@ private extension SetGameView {
         } else {
             ZStack {
                 ForEach(cards) { card in
-                    CardView(card: themedCard(card))
+                    CardView(card: presentation(of: card))
                         .matchedGeometryEffect(
                             id: card.id,
                             in: dealing
                         )
+                        .offset(
+                            positions[card.id]?.offset 
+                            ?? .zero
+                        )
+                        .rotationEffect(.degrees(
+                            positions[card.id]?.angle
+                            ?? .zero
+                        ))
                 }
             }
         }
@@ -199,20 +227,20 @@ private extension SetGameView {
         themedGame.isMatch == true
     }
     
-    func themedCard(
-        _ card: SetGame.Card
+    func presentation(
+        of card: Card
     ) -> ThemedCard {
         
         themedGame.card(
-            card,
+            presenting: card,
             isFaceUp: faceUpIds
                 .contains(card.id)
         )
     }
     
     func cards(
-        from ids: [SetGame.Card.ID]
-    ) -> [SetGame.Card] {
+        from ids: [CardID]
+    ) -> [Card] {
         
         ids
             .compactMap { id in
@@ -244,6 +272,7 @@ private extension SetGameView {
         
         if !isDealing {
             faceUpIds.removeAll()
+            positions.removeAll()
         }
         
         updateUI(
@@ -281,6 +310,13 @@ private extension SetGameView {
         ) {
             faceUpIds.append($1)
         }
+        
+        if positions.isEmpty {
+            themedGame.cards
+                .forEach { card in
+                    positions[card.id] = .init()
+                }
+        }
     }
 }
 
@@ -314,6 +350,13 @@ private extension Array where Element == SetGame.Card.ID {
                     closure(index, card.id)
                 }
             }
+    }
+}
+
+private extension Double {
+    
+    static var randomPosition: Self {
+        .random(in: -5...5)
     }
 }
 
