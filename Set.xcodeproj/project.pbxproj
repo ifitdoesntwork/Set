@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		926DF8442BE37A340004FCAA /* Cardify.swift in Sources */ = {isa = PBXBuildFile; fileRef = 926DF8432BE37A340004FCAA /* Cardify.swift */; };
+		92711C4D2BE8C0A70039F853 /* ThemedCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92711C4C2BE8C0A70039F853 /* ThemedCard.swift */; };
 		92A3AC062BCF895B00623609 /* SetApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A3AC052BCF895B00623609 /* SetApp.swift */; };
 		92A3AC0A2BCF895D00623609 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 92A3AC092BCF895D00623609 /* Assets.xcassets */; };
 		92A3AC0D2BCF895D00623609 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 92A3AC0C2BCF895D00623609 /* Preview Assets.xcassets */; };
@@ -23,6 +24,7 @@
 
 /* Begin PBXFileReference section */
 		926DF8432BE37A340004FCAA /* Cardify.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Cardify.swift; sourceTree = "<group>"; };
+		92711C4C2BE8C0A70039F853 /* ThemedCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemedCard.swift; sourceTree = "<group>"; };
 		92A3AC022BCF895B00623609 /* Set.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Set.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		92A3AC052BCF895B00623609 /* SetApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetApp.swift; sourceTree = "<group>"; };
 		92A3AC092BCF895D00623609 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -87,6 +89,7 @@
 			isa = PBXGroup;
 			children = (
 				92A3AC172BCF95F200623609 /* ThemedGame.swift */,
+				92711C4C2BE8C0A70039F853 /* ThemedCard.swift */,
 				92A3AC1B2BCFC53500623609 /* Theme+UI.swift */,
 			);
 			path = ViewModel;
@@ -198,6 +201,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				92711C4D2BE8C0A70039F853 /* ThemedCard.swift in Sources */,
 				92A3AC2B2BD0F4E500623609 /* AspectVGrid.swift in Sources */,
 				92A3AC262BD0E8D100623609 /* CardView.swift in Sources */,
 				92A3AC1C2BCFC53500623609 /* Theme+UI.swift in Sources */,

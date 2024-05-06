@@ -32,6 +32,19 @@ class ThemedGame: ObservableObject {
         && !isOver
     }
     
+    func card(
+        _ card: SetGame.Card,
+        isFaceUp: Bool
+    ) -> ThemedCard {
+        
+        .init(
+            card: card,
+            theme: theme,
+            isMatch: isMatch,
+            isFaceUp: isFaceUp
+        )
+    }
+    
     func timerEnd(
         for player: SetGame.Player
     ) -> Date? {

@@ -8,10 +8,7 @@
 import SwiftUI
 
 struct CardView: View {
-    let card: SetGame.Card
-    let isMatch: Bool?
-    let isFaceUp: Bool
-    let theme: Theme
+    let card: ThemedCard
     
     var body: some View {
         
@@ -23,9 +20,8 @@ struct CardView: View {
             features(aspectRatio: aspectRatio)
                 .padding(Constants.padding)
                 .cardify(
-                    isFaceUp: isFaceUp,
-                    backgroundStyle: card
-                        .backgroundColor(isMatch: isMatch)
+                    isFaceUp: card.isFaceUp,
+                    backgroundStyle: card.backgroundColor
                         .opacity(Constants.backgroundOpacity)
                 )
                 .foregroundStyle(.gray)
@@ -41,27 +37,24 @@ private extension CardView {
         
         VStack {
             ForEach(
-                1...card.number(from: theme).rawValue,
+                1...card.number.rawValue,
                 id: \.self
             ) { _ in
                 
-                card
-                    .shape(from: theme)
-                    .ui(shading: card.shading(from: theme))
+                card.shape
+                    .ui(shading: card.shading)
                     .padding(Constants.padding)
                     .aspectRatio(
                         aspectRatio * 3,
                         contentMode: .fit
                     )
-                    .foregroundStyle(
-                        card.color(from: theme).ui
-                    )
+                    .foregroundStyle(card.color.ui)
                     .match(
-                        isMatch: isMatch == true,
+                        isMatch: card.isMatch == true,
                         isSelected: card.isSelected
                     )
                     .mismatch(
-                        isMismatch: isMatch == false,
+                        isMismatch: card.isMatch == false,
                         isSelected: card.isSelected
                     )
             }
@@ -121,17 +114,17 @@ private extension View {
             TriState.allCases,
             id: \.self
         ) {
-            CardView(
+            CardView(card: .init(
                 card: .init(
                     content: .init(
                         repeating: $0,
                         count: 4
                     )
                 ),
+                theme: .classic,
                 isMatch: nil,
-                isFaceUp: $0.rawValue % 2 == 0,
-                theme: .classic
-            )
+                isFaceUp: $0.rawValue % 2 == 0
+            ))
         }
     }
     .padding()

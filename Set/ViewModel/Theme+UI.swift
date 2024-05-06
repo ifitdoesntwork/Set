@@ -7,37 +7,6 @@
 
 import SwiftUI
 
-extension SetGame.Card {
-    
-    func color(
-        from theme: Theme
-    ) -> Theme.Color {
-        
-        theme.colors[content[0].rawValue]
-    }
-    
-    func shape(
-        from theme: Theme
-    ) -> Theme.Shape {
-        
-        theme.shapes[content[1].rawValue]
-    }
-    
-    func shading(
-        from theme: Theme
-    ) -> Theme.Shading {
-        
-        theme.shadings[content[2].rawValue]
-    }
-    
-    func number(
-        from theme: Theme
-    ) -> Theme.Number {
-        
-        theme.numbers[content[3].rawValue]
-    }
-}
-
 extension Theme.Color {
     
     var ui: Color {
@@ -105,27 +74,6 @@ extension Theme.Shape {
         case .oval:
             Ellipse()
                 .shading(shading)
-        }
-    }
-}
-
-extension SetGame.Card {
-    
-    func backgroundColor(
-        isMatch: Bool?
-    ) -> SwiftUI.Color {
-        
-        if isSelected {
-            switch isMatch {
-            case .some(true):
-                .green
-            case .some(false):
-                .red
-            case .none:
-                .yellow
-            }
-        } else {
-            .white
         }
     }
 }

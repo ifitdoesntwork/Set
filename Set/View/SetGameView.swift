@@ -20,6 +20,12 @@ struct SetGameView: View {
         
         cards
             .padding(.horizontal)
+            .onTapGesture {
+                withAnimation {
+                    fieldIds
+                        .shuffle()
+                }
+            }
         
         panel(for: themedGame.players[1])
             .onAppear {
@@ -41,24 +47,19 @@ private extension SetGameView {
             minWidth: Constants.minWidth
         ) { card in
             
-            CardView(
-                card: card,
-                isMatch: themedGame.isMatch,
-                isFaceUp: isFaceUp(card),
-                theme: themedGame.theme
-            )
-            .matchedGeometryEffect(
-                id: card.id,
-                in: dealing
-            )
-            .padding(Constants.cardPadding)
-            .onTapGesture {
-                withAnimation {
-                    themedGame.choose(card)
+            CardView(card: themedCard(card))
+                .matchedGeometryEffect(
+                    id: card.id,
+                    in: dealing
+                )
+                .padding(Constants.cardPadding)
+                .onTapGesture {
+                    withAnimation {
+                        themedGame.choose(card)
+                    }
+                    
+                    updateUI()
                 }
-                
-                updateUI()
-            }
         }
     }
     
@@ -122,16 +123,11 @@ private extension SetGameView {
         } else {
             ZStack {
                 ForEach(cards) { card in
-                    CardView(
-                        card: card,
-                        isMatch: nil,
-                        isFaceUp: isFaceUp(card),
-                        theme: themedGame.theme
-                    )
-                    .matchedGeometryEffect(
-                        id: card.id,
-                        in: dealing
-                    )
+                    CardView(card: themedCard(card))
+                        .matchedGeometryEffect(
+                            id: card.id,
+                            in: dealing
+                        )
                 }
             }
         }
@@ -203,12 +199,15 @@ private extension SetGameView {
         themedGame.isMatch == true
     }
     
-    func isFaceUp(
+    func themedCard(
         _ card: SetGame.Card
-    ) -> Bool {
+    ) -> ThemedCard {
         
-        faceUpIds
-            .contains(card.id)
+        themedGame.card(
+            card,
+            isFaceUp: faceUpIds
+                .contains(card.id)
+        )
     }
     
     func cards(
