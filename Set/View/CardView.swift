@@ -86,6 +86,14 @@ private extension CardView {
                     .foregroundStyle(
                         card.color(from: theme).ui
                     )
+                    .match(
+                        isMatch: isMatch == true,
+                        isSelected: card.isSelected
+                    )
+                    .mismatch(
+                        isMismatch: isMatch == false,
+                        isSelected: card.isSelected
+                    )
             }
         }
     }
@@ -95,6 +103,46 @@ private extension CardView {
         static let backgroundOpacity: CGFloat = 0.3
         static let lineWidth: CGFloat = 2
         static let padding: CGFloat = 5
+    }
+}
+
+private extension View {
+    
+    func match(
+        isMatch: Bool,
+        isSelected: Bool
+    ) -> some View {
+        
+        rotationEffect(.radians(
+            isSelected && isMatch
+                ? .pi * 2 : .zero
+        ))
+        .animation(
+            isSelected
+                ? .linear(duration: 0.5)
+                  .repeatCount(2, autoreverses: false)
+                : nil,
+            value: isSelected && isMatch
+        )
+    }
+    
+    func mismatch(
+        isMismatch: Bool,
+        isSelected: Bool
+    ) -> some View {
+        
+        rotation3DEffect(
+            .radians(
+                isSelected && isMismatch
+                    ? .pi * 2 : .zero
+            ),
+            axis: (x: 0, y: 1, z: 0)
+        )
+        .animation(
+            isSelected 
+                ? .linear(duration: 0.4) : nil,
+            value: isSelected && isMismatch
+        )
     }
 }
 
