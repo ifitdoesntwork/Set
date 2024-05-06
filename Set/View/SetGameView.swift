@@ -11,6 +11,7 @@ struct SetGameView: View {
     @ObservedObject var themedGame: ThemedGame
     @State private var fieldIds = [SetGame.Card.ID]()
     @State private var pileIds = [SetGame.Card.ID]()
+    @State private var faceUpIds = [SetGame.Card.ID]()
     
     var body: some View {
         
@@ -43,7 +44,7 @@ private extension SetGameView {
             CardView(
                 card: card,
                 isMatch: themedGame.isMatch,
-                isFaceUp: card.isFaceUp,
+                isFaceUp: isFaceUp(card),
                 theme: themedGame.theme
             )
             .matchedGeometryEffect(
@@ -124,7 +125,7 @@ private extension SetGameView {
                     CardView(
                         card: card,
                         isMatch: nil,
-                        isFaceUp: card.isFaceUp,
+                        isFaceUp: isFaceUp(card),
                         theme: themedGame.theme
                     )
                     .matchedGeometryEffect(
@@ -202,6 +203,14 @@ private extension SetGameView {
         themedGame.isMatch == true
     }
     
+    func isFaceUp(
+        _ card: SetGame.Card
+    ) -> Bool {
+        
+        faceUpIds
+            .contains(card.id)
+    }
+    
     func cards(
         from ids: [SetGame.Card.ID]
     ) -> [SetGame.Card] {
@@ -234,6 +243,10 @@ private extension SetGameView {
             }
         }
         
+        if !isDealing {
+            faceUpIds.removeAll()
+        }
+        
         updateUI(
             insertionIndices: matchIndices
         )
@@ -262,6 +275,13 @@ private extension SetGameView {
                     : fieldIds.count
             )
         }
+        
+        faceUpIds.update(
+            from: themedGame.cards.field,
+            initialDelay: 0.5
+        ) {
+            faceUpIds.append($1)
+        }
     }
 }
 
@@ -278,6 +298,7 @@ private extension Array where Element == SetGame.Card.ID {
     
     func update(
         from cards: [SetGame.Card],
+        initialDelay: TimeInterval = 0,
         using closure: (Int, Element) -> Void
     ) {
         cards
@@ -286,7 +307,10 @@ private extension Array where Element == SetGame.Card.ID {
             .forEach { index, card in
                 withAnimation(
                     .easeInOut(duration: 0.8)
-                    .delay(TimeInterval(index) * 0.1)
+                    .delay(
+                        initialDelay
+                        + TimeInterval(index) * 0.1
+                    )
                 ) {
                     closure(index, card.id)
                 }

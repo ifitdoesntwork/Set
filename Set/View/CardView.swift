@@ -7,7 +7,6 @@
 
 import SwiftUI
 
-
 struct CardView: View {
     let card: SetGame.Card
     let isMatch: Bool?
@@ -21,49 +20,20 @@ struct CardView: View {
             let aspectRatio = geometry.size.width
             / geometry.size.height
             
-            ZStack {
-                if isFaceUp {
-                    base
-                } else {
-                    background
-                    
-                    features(aspectRatio: aspectRatio)
-                        .padding(Constants.padding)
-                }
-            }
-            .foregroundStyle(.gray)
+            features(aspectRatio: aspectRatio)
+                .padding(Constants.padding)
+                .cardify(
+                    isFaceUp: isFaceUp,
+                    backgroundStyle: card
+                        .backgroundColor(isMatch: isMatch)
+                        .opacity(Constants.backgroundOpacity)
+                )
+                .foregroundStyle(.gray)
         }
     }
 }
 
 private extension CardView {
-    
-    var base: some InsettableShape {
-        
-        RoundedRectangle(
-            cornerRadius: Constants.cornerRadius
-        )
-    }
-    
-    var background: some View {
-        
-        base
-            .foregroundStyle(.background)
-            .overlay(
-                base
-                    .foregroundStyle(
-                        card
-                            .backgroundColor(isMatch: isMatch)
-                            .opacity(Constants.backgroundOpacity)
-                    )
-            )
-            .overlay(
-                base
-                    .strokeBorder(
-                        lineWidth: Constants.lineWidth
-                    )
-        )
-    }
     
     func features(
         aspectRatio: CGFloat
@@ -99,9 +69,7 @@ private extension CardView {
     }
     
     struct Constants {
-        static let cornerRadius: CGFloat = 12
         static let backgroundOpacity: CGFloat = 0.3
-        static let lineWidth: CGFloat = 2
         static let padding: CGFloat = 5
     }
 }
@@ -161,7 +129,7 @@ private extension View {
                     )
                 ),
                 isMatch: nil,
-                isFaceUp: $0.rawValue % 2 == 1,
+                isFaceUp: $0.rawValue % 2 == 0,
                 theme: .classic
             )
         }

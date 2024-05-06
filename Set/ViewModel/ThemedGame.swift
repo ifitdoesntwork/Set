@@ -131,10 +131,3 @@ private extension ThemedGame {
         }
     }
 }
-
-extension SetGame.Card {
-    
-    var isFaceUp: Bool {
-        location == .deck
-    }
-}
