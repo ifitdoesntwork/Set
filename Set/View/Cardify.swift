@@ -38,6 +38,7 @@ struct Cardify<S: ShapeStyle>: ViewModifier, Animatable {
                 content
             } else {
                 base
+                edge
             }
         }
         .rotation3DEffect(
@@ -73,12 +74,22 @@ private extension Cardify {
                     .strokeBorder(
                         lineWidth: Constants.lineWidth
                     )
-        )
+            )
+    }
+    
+    var edge: some View {
+        
+        base
+            .strokeBorder(
+                lineWidth: Constants.edgeWidth
+            )
+            .foregroundStyle(.background)
     }
     
     struct Constants {
         static var cornerRadius: CGFloat { 12 }
         static var lineWidth: CGFloat { 2 }
+        static var edgeWidth: CGFloat { 0.4 }
     }
 }
 

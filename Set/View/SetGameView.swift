@@ -73,6 +73,7 @@ private extension SetGameView {
                     in: dealing
                 )
                 .padding(Constants.cardPadding)
+                .zIndex(zIndex(of: card))
                 .onTapGesture {
                     withAnimation {
                         themedGame.choose(card)
@@ -156,6 +157,7 @@ private extension SetGameView {
                             positions[card.id]?.angle
                             ?? .zero
                         ))
+                        .zIndex(zIndex(of: card))
                 }
             }
         }
@@ -238,6 +240,21 @@ private extension SetGameView {
         )
     }
     
+    func zIndex(
+        of card: Card
+    ) -> Double {
+        
+        themedGame.cards
+            .firstIndex { $0.id == card.id }
+            .map {
+                (fieldIds + pileIds).contains(card.id)
+                    ? .zero
+                    : themedGame.cards.count - $0
+            }
+            .map(Double.init)
+        ?? .zero
+    }
+    
     func cards(
         from ids: [CardID]
     ) -> [Card] {
@@ -283,6 +300,8 @@ private extension SetGameView {
     func updateUI(
         insertionIndices: [Int] = []
     ) {
+        let pileCount = pileIds.count
+        
         let indices = insertionIndices
             .sorted()
         
@@ -294,7 +313,9 @@ private extension SetGameView {
         }
         
         fieldIds.update(
-            from: themedGame.cards.field
+            from: themedGame.cards.field,
+            initialDelay: pileIds.count > pileCount 
+                ? 0.5 : .zero
         ) {
             fieldIds.insert(
                 $1,
